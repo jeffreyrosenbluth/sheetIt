@@ -9,25 +9,41 @@
 import Foundation
 
 struct Person {
-    let perosonID : UUID
+    let personID : UUID
     let name : String
     let nick : (Character, Character)
     
-    func nickToString() -> String {
+    var nickToString : String {
         let (a, b) = nick
         return String([a, b])
     }
 }
 
-extension Person : Equatable {
+extension Person: CustomStringConvertible {
+    var description: String {
+        return "\(nickToString)"
+    }
+}
+
+extension Person: Equatable {
     static func ==(lhs: Person, rhs: Person) -> Bool {
         let eq =
-            lhs.perosonID == rhs.perosonID &&
+            lhs.personID == rhs.personID &&
             lhs.name == rhs.name &&
             lhs.nick == rhs.nick
         return eq
     }
 }
+
+extension Person: Hashable {
+    var hashValue: Int {
+        return personID.hashValue
+    }
+}
+
+let noOne = Person(personID: UUID(), name: "No One", nick: ("X", "X"))
+
+typealias Entry = [Person: Double]
 
 struct Event {
     let eventID: UUID
@@ -39,15 +55,14 @@ struct Event {
     
     var entry: Entry {
         let owe = -amount / Double(participants.count)
-        var e = [eventID: amount]
+        var e: Entry = [:]
         for participant in participants {
-            e[participant.perosonID] = owe
+            e[participant] = owe
         }
+        e.updateValue(e[payer]! + amount, forKey: payer)
         return e
     }
 }
-
-typealias Entry = [UUID: Double]
 
 extension Event : Equatable {
     static func ==(lhs: Event, rhs: Event) -> Bool {
@@ -83,8 +98,8 @@ func total(_ sheet: Sheet) -> Entry {
     return result
 }
 
-func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)! {
-    func ans(dict: [K: V]) -> (K, V)! {
+func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)? {
+    func ans(_ dict: [K: V]) -> (K, V)? {
         guard dict.count > 0 else {return nil}
         var result: (K, V)! = nil
         for (k, v) in dict {
@@ -92,6 +107,8 @@ func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)! {
                 if comp(v, r.1) {
                     result = (k, v)
                 }
+            } else {
+                result = (k, v)
             }
         }
         return result
@@ -99,24 +116,24 @@ func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)! {
     return ans
 }
 
-func minValue<K,V:Comparable>(dict: [K: V]) -> (K, V)! {
+func minValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
     return extremum(comp: <)(dict)
 }
 
-func maxValue<K,V:Comparable>(dict: [K: V]) -> (K, V)! {
+func maxValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
     return extremum(comp: >)(dict)
 }
 
 struct Payment {
-    let from : UUID
-    let to : UUID
+    let from : Person
+    let to : Person
     let payment : Double
 }
 
-func pairOff(e: Entry) -> (Payment, Entry)! {
+func pairOff(_ e: Entry) -> (Payment, Entry)! {
     var ent = e
-    if let (f, a) = maxValue(dict: e) {
-        if let (t, b) = minValue(dict: e) {
+    if let (f, a) = maxValue(e) {
+        if let (t, b) = minValue(e) {
             if a >= abs(b) {
                 ent.updateValue(e[f]! + b, forKey: f)
                 ent.removeValue(forKey: t)
@@ -131,19 +148,15 @@ func pairOff(e: Entry) -> (Payment, Entry)! {
     return nil
 }
 
-enum Impossible: Error {
-    case impossible
-}
-
-func reconcile(e: Entry)  throws -> [Payment]{
-    var ent = e
+func reconcile(_ ent: Entry) -> [Payment] {
+    var ent = ent
     var result = [Payment]()
     while ent.count >= 2 {
-        if let (p, newEvent) = pairOff(e: ent) {
+        if let (p, newEvent) = pairOff(ent) {
             ent = newEvent
             result.append(p)
         } else {
-            throw Impossible.impossible
+            return [Payment(from: noOne, to: noOne, payment: 0)]
         }
     }
     return result
