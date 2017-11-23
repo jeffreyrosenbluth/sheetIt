@@ -8,20 +8,15 @@
 
 import Foundation
 
-struct Person {
+struct Person: Codable {
     let personID : UUID
     let name : String
-    let nick : (Character, Character)
-    
-    var nickToString : String {
-        let (a, b) = nick
-        return String([a, b])
-    }
+    let nick : String
 }
 
 extension Person: CustomStringConvertible {
     var description: String {
-        return "\(nickToString)"
+        return nick
     }
 }
 
@@ -41,11 +36,11 @@ extension Person: Hashable {
     }
 }
 
-let noOne = Person(personID: UUID(), name: "No One", nick: ("X", "X"))
+let noOne = Person(personID: UUID(), name: "No One", nick: "XX")
 
 typealias Entry = [Person: Double]
 
-struct Event {
+struct Event: Codable {
     let eventID: UUID
     let description: String
     let date : Date
