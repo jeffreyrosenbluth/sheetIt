@@ -16,7 +16,8 @@
 		CED9653C1FC5DEA900D00754 /* SheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9653B1FC5DEA900D00754 /* SheetUITests.swift */; };
 		CED9654A1FC5E09700D00754 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED965491FC5E09700D00754 /* Model.swift */; };
 		CED9654C1FC60C7900D00754 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9654B1FC60C7900D00754 /* ModelTests.swift */; };
-		CED965521FC7645500D00754 /* EntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED965511FC7645500D00754 /* EntryViewController.swift */; };
+		CED965561FC8896300D00754 /* PaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED965551FC8896300D00754 /* PaymentViewController.swift */; };
+		CED965641FC8CCAD00D00754 /* SheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED965631FC8CCAD00D00754 /* SheetViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,7 +53,8 @@
 		CED9653D1FC5DEA900D00754 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CED965491FC5E09700D00754 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		CED9654B1FC60C7900D00754 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
-		CED965511FC7645500D00754 /* EntryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryViewController.swift; sourceTree = "<group>"; };
+		CED965551FC8896300D00754 /* PaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewController.swift; sourceTree = "<group>"; };
+		CED965631FC8CCAD00D00754 /* SheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SheetViewController.swift; path = /Users/jeffreyrosenbluth/Develop/iPhone_Apps/Sheet/Sheet/SheetViewController.swift; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,9 +105,10 @@
 		CED9651A1FC5DEA900D00754 /* Sheet */ = {
 			isa = PBXGroup;
 			children = (
-				CED965511FC7645500D00754 /* EntryViewController.swift */,
+				CED965631FC8CCAD00D00754 /* SheetViewController.swift */,
 				CED9651B1FC5DEA900D00754 /* AppDelegate.swift */,
 				CED9651D1FC5DEA900D00754 /* ViewController.swift */,
+				CED965551FC8896300D00754 /* PaymentViewController.swift */,
 				CED965491FC5E09700D00754 /* Model.swift */,
 				CED9651F1FC5DEA900D00754 /* Main.storyboard */,
 				CED965221FC5DEA900D00754 /* Assets.xcassets */,
@@ -269,7 +272,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CED9654A1FC5E09700D00754 /* Model.swift in Sources */,
-				CED965521FC7645500D00754 /* EntryViewController.swift in Sources */,
+				CED965641FC8CCAD00D00754 /* SheetViewController.swift in Sources */,
+				CED965561FC8896300D00754 /* PaymentViewController.swift in Sources */,
 				CED9651E1FC5DEA900D00754 /* ViewController.swift in Sources */,
 				CED9651C1FC5DEA900D00754 /* AppDelegate.swift in Sources */,
 			);

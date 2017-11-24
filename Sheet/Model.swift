@@ -72,15 +72,19 @@ extension Event : Equatable {
     }
 }
 
-typealias Sheet = [Event]
+//typealias Sheet = [Event]
+struct Sheet: Codable {
+    let people: [Person]
+    let events: [Event]
+}
 
 func deleteEntry(sheet: Sheet, id: UUID) -> Sheet {
-    return sheet.filter {$0.eventID != id}
+    return Sheet(people: sheet.people, events: sheet.events.filter {$0.eventID != id})
 }
 
 func total(_ sheet: Sheet) -> Entry {
     var result = Entry()
-    let entries = sheet.map {$0.entry}
+    let entries = sheet.events.map {$0.entry}
     for e in entries {
         for (key, value) in e {
             if let v = result[key] {
