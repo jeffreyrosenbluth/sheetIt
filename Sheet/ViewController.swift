@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UITableViewController {
     
-    var currentSheet: Sheet!
+    var currentSheet = Sheet()
     
   
 // For testing, needs to be deleted. --------------------------------------------------------------
@@ -21,10 +21,7 @@ class ViewController: UITableViewController {
 //    var bowling: Event!
 //    var skiing: Event!
     // For testing, needs to be deleted. --------------------------------------------------------------
-//    let john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
-//    let paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
-//    let george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
-//    let ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
+    
 //    let bowling = Event(eventID: UUID(), description: "Bowling", date: Date.init(timeIntervalSinceNow: 10), payer: john, participants: [john, paul, ringo, george], amount: 120)
 //    let skiing = Event(eventID: UUID(), description: "Skiing at Jackson Hole", date: Date(timeIntervalSinceNow: 11), payer: ringo, participants: [george, ringo], amount: 900)
 //    currentSheet.people = [john, paul, george, ringo]
@@ -34,6 +31,7 @@ class ViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         title = "Sheet-It"
         navigationController?.navigationBar.prefersLargeTitles = true
         
@@ -43,11 +41,16 @@ class ViewController: UITableViewController {
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
 
         self.toolbarItems = [addParticipantButton, space, paymentsButton, space, addEventButton]
-
+        let john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
+        let paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
+        let george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
+        let ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
+        currentSheet.people = [john, paul, george, ringo]
     }
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.toolbar.isHidden = false
+        self.tableView.reloadData()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

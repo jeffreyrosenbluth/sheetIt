@@ -74,8 +74,8 @@ extension Event : Equatable {
 
 //typealias Sheet = [Event]
 class Sheet: Codable {
-    var people: [Person]
-    var events: [Event]
+    var people = [noOne]
+    var events = [Event]()
     
     func deleteEntry(sheet: Sheet, id: UUID) {
         sheet.events = sheet.events.filter({$0.eventID != id})

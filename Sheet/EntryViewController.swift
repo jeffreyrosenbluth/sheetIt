@@ -10,7 +10,7 @@ import UIKit
 
 class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource  {
     
-    var currentSheet: Sheet!
+    var currentSheet = Sheet()
 
     @IBOutlet weak var desc: UITextField!
     @IBOutlet weak var amount: UITextField!
@@ -36,7 +36,7 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @objc func doneTapped() {
         let payer = noOne
         let participants = [noOne]
-        let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: 1.0)
+        let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: Double(amount.text!)!)
         currentSheet.events.append(event)
         navigationController?.popViewController(animated: true)
     }
