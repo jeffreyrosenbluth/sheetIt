@@ -30,7 +30,7 @@ class ViewController: UITableViewController {
         let addParticipantButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: nil)
         let paymentsButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(paymentsTapped))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: nil)
+        let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
 
         self.toolbarItems = [addParticipantButton, space, paymentsButton, space, addEventButton]
 // For testing, needs to be deleted. --------------------------------------------------------------
@@ -62,7 +62,7 @@ class ViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? SheetViewController {
+        if let evc = storyboard?.instantiateViewController(withIdentifier: "Sheet") as? SheetViewController {
             evc.selectedEvent = currentSheet.events[indexPath.row]
             navigationController?.pushViewController(evc, animated: true)
         }
@@ -72,6 +72,16 @@ class ViewController: UITableViewController {
         if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
             pvc.payments = reconcile(total(currentSheet))
             navigationController?.pushViewController(pvc, animated: true)
+        }
+    }
+    
+    @objc func entryTapped() {
+        if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? EntryViewController {
+            evc.participants = currentSheet.people
+            let backItem = UIBarButtonItem()
+            backItem.title = "Cancel"
+            navigationItem.backBarButtonItem = backItem
+            navigationController?.pushViewController(evc, animated: true)
         }
     }
     

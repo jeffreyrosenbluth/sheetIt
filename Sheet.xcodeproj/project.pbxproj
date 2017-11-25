@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CE8AE2581FC8CE4400C61E6F /* EntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8AE2571FC8CE4400C61E6F /* EntryViewController.swift */; };
 		CED9651C1FC5DEA900D00754 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9651B1FC5DEA900D00754 /* AppDelegate.swift */; };
 		CED9651E1FC5DEA900D00754 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9651D1FC5DEA900D00754 /* ViewController.swift */; };
 		CED965211FC5DEA900D00754 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CED9651F1FC5DEA900D00754 /* Main.storyboard */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CE8AE2571FC8CE4400C61E6F /* EntryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryViewController.swift; sourceTree = "<group>"; };
 		CED965181FC5DEA900D00754 /* Sheet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sheet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CED9651B1FC5DEA900D00754 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CED9651D1FC5DEA900D00754 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 		CED9651A1FC5DEA900D00754 /* Sheet */ = {
 			isa = PBXGroup;
 			children = (
+				CE8AE2571FC8CE4400C61E6F /* EntryViewController.swift */,
 				CED965631FC8CCAD00D00754 /* SheetViewController.swift */,
 				CED9651B1FC5DEA900D00754 /* AppDelegate.swift */,
 				CED9651D1FC5DEA900D00754 /* ViewController.swift */,
@@ -276,6 +279,7 @@
 				CED965561FC8896300D00754 /* PaymentViewController.swift in Sources */,
 				CED9651E1FC5DEA900D00754 /* ViewController.swift in Sources */,
 				CED9651C1FC5DEA900D00754 /* AppDelegate.swift in Sources */,
+				CE8AE2581FC8CE4400C61E6F /* EntryViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
