@@ -22,11 +22,6 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
         navigationItem.rightBarButtonItem = doneButton
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -36,7 +31,13 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @objc func doneTapped() {
         let payer = noOne
         let participants = [noOne]
-        let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: Double(amount.text!)!)
+        var payment = 0.0
+        if let t = amount.text {
+            if let p = Double(t) {
+                payment = p
+            }
+        }
+        let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: payment)
         currentSheet.events.append(event)
         navigationController?.popViewController(animated: true)
     }

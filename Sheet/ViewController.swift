@@ -12,23 +12,6 @@ class ViewController: UITableViewController {
     
     var currentSheet = Sheet()
     
-  
-// For testing, needs to be deleted. --------------------------------------------------------------
-//    var john: Person!
-//    var paul: Person!
-//    var george: Person!
-//    var ringo: Person!
-//    var bowling: Event!
-//    var skiing: Event!
-    // For testing, needs to be deleted. --------------------------------------------------------------
-    
-//    let bowling = Event(eventID: UUID(), description: "Bowling", date: Date.init(timeIntervalSinceNow: 10), payer: john, participants: [john, paul, ringo, george], amount: 120)
-//    let skiing = Event(eventID: UUID(), description: "Skiing at Jackson Hole", date: Date(timeIntervalSinceNow: 11), payer: ringo, participants: [george, ringo], amount: 900)
-//    currentSheet.people = [john, paul, george, ringo]
-//    currentSheet.events = [bowling, skiing]
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
