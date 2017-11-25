@@ -14,12 +14,22 @@ class ViewController: UITableViewController {
     
   
 // For testing, needs to be deleted. --------------------------------------------------------------
-    var john: Person!
-    var paul: Person!
-    var george: Person!
-    var ringo: Person!
-    var bowling: Event!
-    var skiing: Event!
+//    var john: Person!
+//    var paul: Person!
+//    var george: Person!
+//    var ringo: Person!
+//    var bowling: Event!
+//    var skiing: Event!
+    // For testing, needs to be deleted. --------------------------------------------------------------
+//    let john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
+//    let paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
+//    let george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
+//    let ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
+//    let bowling = Event(eventID: UUID(), description: "Bowling", date: Date.init(timeIntervalSinceNow: 10), payer: john, participants: [john, paul, ringo, george], amount: 120)
+//    let skiing = Event(eventID: UUID(), description: "Skiing at Jackson Hole", date: Date(timeIntervalSinceNow: 11), payer: ringo, participants: [george, ringo], amount: 900)
+//    currentSheet.people = [john, paul, george, ringo]
+//    currentSheet.events = [bowling, skiing]
+//-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
     
     override func viewDidLoad() {
@@ -33,17 +43,7 @@ class ViewController: UITableViewController {
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
 
         self.toolbarItems = [addParticipantButton, space, paymentsButton, space, addEventButton]
-// For testing, needs to be deleted. --------------------------------------------------------------
-        john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
-        paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
-        george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
-        ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
-        bowling = Event(eventID: UUID(), description: "Bowling", date: Date.init(timeIntervalSinceNow: 10), payer: john, participants: [john, paul, ringo, george], amount: 120)
-        skiing = Event(eventID: UUID(), description: "Skiing at Jackson Hole", date: Date(timeIntervalSinceNow: 11), payer: ringo, participants: [george, ringo], amount: 900)
-        let people = [john!, paul!, george!, ringo!]
-        let events = [bowling!, skiing!]
-        currentSheet = Sheet(people:people, events: events)
-//-------------------------------------------------------------------------------------------------
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -77,14 +77,16 @@ class ViewController: UITableViewController {
     
     @objc func entryTapped() {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? EntryViewController {
-            evc.participants = currentSheet.people
+            evc.currentSheet = currentSheet
             let backItem = UIBarButtonItem()
             backItem.title = "Cancel"
             navigationItem.backBarButtonItem = backItem
+           
             navigationController?.pushViewController(evc, animated: true)
-        }
+            }
     }
     
+   
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

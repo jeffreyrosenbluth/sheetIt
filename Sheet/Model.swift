@@ -73,13 +73,13 @@ extension Event : Equatable {
 }
 
 //typealias Sheet = [Event]
-struct Sheet: Codable {
-    let people: [Person]
-    let events: [Event]
-}
-
-func deleteEntry(sheet: Sheet, id: UUID) -> Sheet {
-    return Sheet(people: sheet.people, events: sheet.events.filter {$0.eventID != id})
+class Sheet: Codable {
+    var people: [Person]
+    var events: [Event]
+    
+    func deleteEntry(sheet: Sheet, id: UUID) {
+        sheet.events = sheet.events.filter({$0.eventID != id})
+    }
 }
 
 func total(_ sheet: Sheet) -> Entry {
