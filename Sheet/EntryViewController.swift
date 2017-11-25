@@ -11,6 +11,7 @@ import UIKit
 class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource  {
     
     var currentSheet = Sheet()
+    var selectedPeople = [IndexPath]()
 
     @IBOutlet weak var desc: UITextField!
     @IBOutlet weak var amount: UITextField!
@@ -29,8 +30,13 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func doneTapped() {
-        let payer = noOne
-        let participants = [noOne]
+        let payerIndex = payerPicker.selectedRow(inComponent: 0)
+        let payer = currentSheet.people[payerIndex]
+        let paticipantIndices = participantTable.indexPathsForSelectedRows
+        var participants = [Person]()
+        if let indices = paticipantIndices {
+            participants = indices.map {currentSheet.people[$0.row]}
+        }
         var payment = 0.0
         if let t = amount.text {
             if let p = Double(t) {
