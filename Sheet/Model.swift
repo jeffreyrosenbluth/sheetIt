@@ -54,7 +54,11 @@ struct Event: Codable {
         for participant in participants {
             e[participant] = owe
         }
-        e.updateValue(e[payer]! + amount, forKey: payer)
+        if let payerShare = e[payer] {
+            e.updateValue(payerShare + amount, forKey: payer)
+        } else {
+            e[payer] = amount
+        }
         return e
     }
 }
@@ -74,7 +78,7 @@ extension Event : Equatable {
 
 //typealias Sheet = [Event]
 class Sheet: Codable {
-    var people = [noOne]
+    var people = [Person]()
     var events = [Event]()
     
     func deleteEntry(sheet: Sheet, id: UUID) {

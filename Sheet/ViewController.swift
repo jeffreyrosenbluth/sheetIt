@@ -8,27 +8,21 @@
 
 import UIKit
 
-class ViewController: UITableViewController {
+class ViewController: UITableViewController, UITextFieldDelegate {
     
     var currentSheet = Sheet()
+    var nameField = UITextField()
+    var nickField = UITextField()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         title = "Sheet-It"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
-        let addParticipantButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: nil)
+        let addParticipantButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(participantTapped))
         let paymentsButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(paymentsTapped))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
-
         self.toolbarItems = [addParticipantButton, space, paymentsButton, space, addEventButton]
-        let john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
-        let paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
-        let george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
-        let ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
-        currentSheet.people = [john, paul, george, ringo]
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -64,15 +58,54 @@ class ViewController: UITableViewController {
     @objc func entryTapped() {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? EntryViewController {
             evc.currentSheet = currentSheet
-            let backItem = UIBarButtonItem()
-            backItem.title = "Cancel"
-            navigationItem.backBarButtonItem = backItem
-           
             navigationController?.pushViewController(evc, animated: true)
             }
     }
     
-   
+    @objc func participantTapped() {
+        let participantAlertController = UIAlertController(title: "New Participant", message: nil, preferredStyle: .alert)
+        
+        func getName(t: UITextField) {
+            t.placeholder = "Name"
+            t.clearButtonMode = .always
+            t.delegate = self
+        }
+        func getNick(t: UITextField) {
+            t.placeholder = "Initials"
+            t.clearButtonMode = .always
+        }
+        func add(a: UIAlertAction) {
+            if let name = participantAlertController.textFields?[0].text {
+                if let nick = participantAlertController.textFields?[1].text {
+                    if name != "" && nick != "" {
+                        currentSheet.people.append(Person(personID: UUID(), name: name, nick: nick))
+                    }
+                }
+            }
+        }
+        participantAlertController.addTextField(configurationHandler: getName)
+        participantAlertController.addTextField(configurationHandler: getNick)
+        nameField = participantAlertController.textFields![0]
+        nickField = participantAlertController.textFields![1]
+        participantAlertController.addAction(UIAlertAction(title: "Add", style: .default, handler: add))
+        participantAlertController.addAction((UIAlertAction(title: "Cancel", style: .cancel, handler: nil)))
+        present(participantAlertController, animated: true)
+    }
+
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField === nameField {
+            if currentSheet.people.map({$0.name}).contains(nameField.text!) {
+                return false
+            }
+        }
+        if textField === nickField {
+            if currentSheet.people.map({$0.nick}).contains(nickField.text!) {
+                return false
+            }
+        }
+        return true
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
