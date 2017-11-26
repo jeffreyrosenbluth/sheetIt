@@ -11,7 +11,7 @@ import UIKit
 class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource  {
     
     var currentSheet = Sheet()
-    var selectedPeople = [IndexPath]()
+    var selectedPeople: Set<Int> = []
 
     @IBOutlet weak var desc: UITextField!
     @IBOutlet weak var amount: UITextField!
@@ -32,11 +32,7 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @objc func doneTapped() {
         let payerIndex = payerPicker.selectedRow(inComponent: 0)
         let payer = currentSheet.people[payerIndex]
-        let paticipantIndices = participantTable.indexPathsForSelectedRows
-        var participants = [Person]()
-        if let indices = paticipantIndices {
-            participants = indices.map {currentSheet.people[$0.row]}
-        }
+        let participants = selectedPeople.map {currentSheet.people[$0]}
         var payment = 0.0
         if let t = amount.text {
             if let p = Double(t) {
@@ -81,9 +77,11 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
             if cell.accessoryType == .checkmark{
                 cell.accessoryType = .none
+                selectedPeople.remove(indexPath.row)
             }
             else{
                 cell.accessoryType = .checkmark
+                selectedPeople.update(with: indexPath.row)
             }
         }
     }
