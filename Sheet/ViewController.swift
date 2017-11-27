@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UITableViewController, UITextFieldDelegate {
     
-    var currentSheet = Sheet()
+    var currentSheet = readSheet()
     var nameField = UITextField()
     var nickField = UITextField()
     
@@ -79,6 +79,7 @@ class ViewController: UITableViewController, UITextFieldDelegate {
                 if let nick = participantAlertController.textFields?[1].text {
                     if name != "" && nick != "" {
                         currentSheet.people.append(Person(personID: UUID(), name: name, nick: nick))
+                        writeSheet(currentSheet)
                     }
                 }
             }

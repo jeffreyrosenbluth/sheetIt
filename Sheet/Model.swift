@@ -175,5 +175,33 @@ extension Payment : Equatable {
     }
 }
 
+func getDocumentsDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    return paths[0]
+}
 
+func getSheetItURL() -> URL {
+    return getDocumentsDirectory().appendingPathComponent("sheetit")
+}
 
+func writeSheet(_ sheet: Sheet) {
+    let url = getSheetItURL()
+    let encoder = JSONEncoder()
+    do {
+        let json = try encoder.encode(sheet)
+        try json.write(to: url)
+    } catch {
+        print("Could not encode and save sheet")
+    }
+}
+
+func readSheet() -> Sheet {
+    let url = getSheetItURL()
+    do {
+        let data = try Data(contentsOf: url)
+        let sheet = try JSONDecoder().decode(Sheet.self, from: data)
+        return sheet
+    } catch {
+        return Sheet()
+    }
+}

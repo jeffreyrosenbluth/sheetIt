@@ -41,6 +41,7 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: payment)
         currentSheet.events.append(event)
+        writeSheet(currentSheet)
         navigationController?.popViewController(animated: true)
     }
     
