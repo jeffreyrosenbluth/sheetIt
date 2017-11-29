@@ -9,34 +9,26 @@
 import Foundation
 
 struct Person: Codable {
-    let personID : UUID
     let name : String
-    let nick : String
-}
-
-extension Person: CustomStringConvertible {
-    var description: String {
-        return nick
-    }
+    let email : String?
 }
 
 extension Person: Equatable {
     static func ==(lhs: Person, rhs: Person) -> Bool {
         let eq =
-            lhs.personID == rhs.personID &&
             lhs.name == rhs.name &&
-            lhs.nick == rhs.nick
+            lhs.email == rhs.email
         return eq
     }
 }
 
 extension Person: Hashable {
     var hashValue: Int {
-        return personID.hashValue
+        return name.hashValue
     }
 }
 
-let noOne = Person(personID: UUID(), name: "No One", nick: "XX")
+let noOne = Person(name: "No One", email: nil)
 
 typealias Entry = [Person: Double]
 
@@ -60,6 +52,14 @@ struct Event: Codable {
             e[payer] = amount
         }
         return e
+    }
+    
+    var valid: Bool {
+        if description == "" || amount <= 0 || participants == [] {
+            return false
+        } else {
+            return true
+        }
     }
 }
 
@@ -157,7 +157,9 @@ func reconcile(_ ent: Entry) -> [Payment] {
     while ent.count >= 2 {
         if let (p, newEvent) = pairOff(ent) {
             ent = newEvent
-            result.append(p)
+            if p.payment > 0 {
+                result.append(p)
+            }
         } else {
             return [Payment(from: noOne, to: noOne, payment: 0)]
         }

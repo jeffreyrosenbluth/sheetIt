@@ -24,12 +24,12 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
         navigationItem.rightBarButtonItem = addEventButton
         navigationItem.leftBarButtonItem = self.editButtonItem
-        self.toolbarItems = [addParticipantButton, space, settleButton]
+        toolbarItems = [addParticipantButton, space, settleButton]
     }
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.toolbar.isHidden = false
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -53,7 +53,7 @@ class ViewController: UITableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             currentSheet.events.remove(at: indexPath.row)
-            tableView.reloadData()
+            tableView.deleteRows(at: [indexPath], with: .automatic)
             writeSheet(currentSheet)
         }
     }
@@ -80,24 +80,16 @@ class ViewController: UITableViewController, UITextFieldDelegate {
             t.clearButtonMode = .always
             t.delegate = self
         }
-        func getNick(t: UITextField) {
-            t.placeholder = "Initials"
-            t.clearButtonMode = .always
-        }
         func add(a: UIAlertAction) {
             if let name = participantAlertController.textFields?[0].text {
-                if let nick = participantAlertController.textFields?[1].text {
-                    if name != "" && nick != "" {
-                        currentSheet.people.append(Person(personID: UUID(), name: name, nick: nick))
-                        writeSheet(currentSheet)
-                    }
+                if name != ""  {
+                    currentSheet.people.append(Person(name: name, email: nil))
+                    writeSheet(currentSheet)
                 }
             }
         }
         participantAlertController.addTextField(configurationHandler: getName)
-        participantAlertController.addTextField(configurationHandler: getNick)
         nameField = participantAlertController.textFields![0]
-        nickField = participantAlertController.textFields![1]
         participantAlertController.addAction(UIAlertAction(title: "Add", style: .default, handler: add))
         participantAlertController.addAction((UIAlertAction(title: "Cancel", style: .cancel, handler: nil)))
         present(participantAlertController, animated: true)
@@ -106,11 +98,6 @@ class ViewController: UITableViewController, UITextFieldDelegate {
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         if textField === nameField {
             if currentSheet.people.map({$0.name}).contains(nameField.text!) {
-                return false
-            }
-        }
-        if textField === nickField {
-            if currentSheet.people.map({$0.nick}).contains(nickField.text!) {
                 return false
             }
         }

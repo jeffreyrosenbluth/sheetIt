@@ -42,8 +42,10 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
             }
         }
         let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: payment)
-        currentSheet.events.append(event)
-        writeSheet(currentSheet)
+        if event.valid {
+            currentSheet.events.append(event)
+            writeSheet(currentSheet)
+        }
         navigationController?.popViewController(animated: true)
     }
     
@@ -63,7 +65,6 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return currentSheet.people[row].name
     }
-    // MARK: - Table view data source
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currentSheet.people.count
