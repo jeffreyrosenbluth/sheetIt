@@ -18,13 +18,13 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         super.viewDidLoad()
         title = "Sheet-It"
         navigationController?.navigationBar.prefersLargeTitles = true
-        let addParticipantButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(participantTapped))
-        let paymentsButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(paymentsTapped))
+        let addParticipantButton = UIBarButtonItem(title: "Add Member", style: .plain,  target: self, action: #selector(participantTapped))
+        let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
         navigationItem.rightBarButtonItem = addEventButton
         navigationItem.leftBarButtonItem = self.editButtonItem
-        self.toolbarItems = [addParticipantButton, space, paymentsButton]
+        self.toolbarItems = [addParticipantButton, space, settleButton]
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -58,7 +58,7 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         }
     }
     
-    @objc func paymentsTapped() {
+    @objc func settleTapped() {
         if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
             pvc.payments = reconcile(total(currentSheet))
             navigationController?.pushViewController(pvc, animated: true)
