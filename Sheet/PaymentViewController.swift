@@ -44,8 +44,6 @@ class PaymentViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PaymentCell", for: indexPath) as! PaymentCell
         let pmt = payments![indexPath.row]
         let amt = String(format: "$%.02f", pmt.payment)
-//        let pmtString = "\(pmt.from) pays \(amt) to \(pmt.to)"
-//        cell.textLabel?.text = pmtString
         cell.from?.text = pmt.from.name
         cell.amount?.text = amt
         cell.to?.text = pmt.to.name

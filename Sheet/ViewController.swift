@@ -22,7 +22,9 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         let paymentsButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(paymentsTapped))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
-        self.toolbarItems = [addParticipantButton, space, paymentsButton, space, addEventButton]
+        navigationItem.rightBarButtonItem = addEventButton
+        navigationItem.leftBarButtonItem = self.editButtonItem
+        self.toolbarItems = [addParticipantButton, space, paymentsButton]
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,6 +47,14 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Sheet") as? SheetViewController {
             evc.selectedEvent = currentSheet.events[indexPath.row]
             navigationController?.pushViewController(evc, animated: true)
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            currentSheet.events.remove(at: indexPath.row)
+            tableView.reloadData()
+            writeSheet(currentSheet)
         }
     }
     
