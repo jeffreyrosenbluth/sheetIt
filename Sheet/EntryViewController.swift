@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource  {
+class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate  {
     
     var currentSheet = Sheet()
     var selectedPeople: Set<Int> = []
@@ -23,6 +23,8 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
         navigationItem.rightBarButtonItem = doneButton
+        desc.delegate = self
+        amount.delegate = self
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -85,5 +87,10 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 selectedPeople.update(with: indexPath.row)
             }
         }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
