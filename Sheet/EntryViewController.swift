@@ -12,12 +12,12 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var currentSheet = Sheet()
     var selectedPeople: Set<Int> = []
+    var payerIndex = -1
 
     @IBOutlet weak var desc: UITextField!
     @IBOutlet weak var amount: UITextField!
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBOutlet weak var participantTable: UITableView!
-    @IBOutlet weak var payerPicker: UIPickerView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +32,11 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func doneTapped() {
-        let payerIndex = payerPicker.selectedRow(inComponent: 0)
+//        let payerIndex = payerPicker.selectedRow(inComponent: 0)
+        if payerIndex < 0 {
+            navigationController?.popViewController(animated: true)
+            return
+        }
         let payer = currentSheet.people[payerIndex]
         let participants = selectedPeople.map {currentSheet.people[$0]}
         var payment = 0.0
@@ -71,18 +75,31 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Payee", for: indexPath)
-        cell.textLabel?.text = currentSheet.people[indexPath.row].name
+        if payerIndex == indexPath.row {
+            cell.textLabel?.text = "🔵 \(currentSheet.people[indexPath.row].name)"
+        } else {
+            cell.textLabel?.text = "⚪️ \(currentSheet.people[indexPath.row].name)"
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
-            if cell.accessoryType == .checkmark{
+            if cell.accessoryType == .checkmark && indexPath.row == payerIndex {
                 cell.accessoryType = .none
+                //                payerIndex = -1
                 selectedPeople.remove(indexPath.row)
+                tableView.reloadData()
             }
-            else{
+            else if cell.accessoryType == .checkmark {
+                payerIndex = indexPath.row
+                tableView.reloadData()
+            }
+            else if indexPath.row == payerIndex {
+                payerIndex = -1
+                tableView.reloadData()
+            } else {
                 cell.accessoryType = .checkmark
                 selectedPeople.update(with: indexPath.row)
             }
