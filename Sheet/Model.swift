@@ -76,7 +76,6 @@ extension Event : Equatable {
     }
 }
 
-//typealias Sheet = [Event]
 class Sheet: Codable {
     var people = [Person]()
     var events = [Event]()
