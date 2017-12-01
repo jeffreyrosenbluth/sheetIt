@@ -21,10 +21,12 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
         navigationItem.rightBarButtonItem = doneButton
         desc.delegate = self
         amount.delegate = self
+        title = "Enter an Event"
     }
 
     override func viewWillAppear(_ animated: Bool) {

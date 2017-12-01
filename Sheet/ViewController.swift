@@ -16,10 +16,17 @@ class ViewController: UITableViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Sheet-It"
+        title = "Sheet 💵 It"
+        let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
+        navigationController?.navigationBar.barTintColor = UIColor.white
+        navigationController?.navigationBar.tintColor = textColor
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
+        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
         navigationController?.navigationBar.prefersLargeTitles = true
         let addParticipantButton = UIBarButtonItem(title: "Add Member", style: .plain,  target: self, action: #selector(participantTapped))
+        addParticipantButton.tintColor = textColor
         let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
+        settleButton.tintColor = textColor
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
         navigationItem.rightBarButtonItem = addEventButton
