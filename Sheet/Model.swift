@@ -100,42 +100,46 @@ func total(_ sheet: Sheet) -> Entry {
     return result
 }
 
-func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)? {
-    func ans(_ dict: [K: V]) -> (K, V)? {
-        guard dict.count > 0 else {return nil}
-        var result: (K, V)! = nil
-        for (k, v) in dict {
-            if let r = result {
-                if comp(v, r.1) {
-                    result = (k, v)
-                }
-            } else {
-                result = (k, v)
-            }
-        }
-        return result
-    }
-    return ans
-}
-
-func minValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
-    return extremum(comp: <)(dict)
-}
-
-func maxValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
-    return extremum(comp: >)(dict)
-}
-
 struct Payment {
     let from : Person
     let to : Person
     let payment : Double
 }
 
-func pairOff(_ e: Entry) -> (Payment, Entry)! {
+func randPair(_ e: Entry) -> (Payment, Entry)? {
     var ent = e
-    if let (f, a) = maxValue(e) {
-        if let (t, b) = minValue(e) {
+    let neg = e.filter({$0.value < 0})
+    let negIdx = Int(arc4random_uniform(UInt32(neg.count)))
+    let negKey = Array(neg.keys)[negIdx]
+    let negVal = neg[negKey]
+    let pos = e.filter({$0.value > 0})
+    let posIdx = Int(arc4random_uniform(UInt32(pos.count)))
+    let posKey = Array(pos.keys)[posIdx]
+    let posVal = pos[posKey]
+    if let a = posVal {
+        if let b = negVal {
+            if a == abs(b) {
+                ent.removeValue(forKey: negKey)
+                ent.removeValue(forKey: posKey)
+                return (Payment(from: negKey, to: posKey, payment: -b), ent)
+            } else if a > abs(b) {
+                ent.updateValue(e[posKey]! + b, forKey: posKey)
+                ent.removeValue(forKey: negKey)
+                return (Payment(from: negKey, to: posKey, payment: -b), ent)
+            } else {
+                ent.removeValue(forKey: posKey)
+                ent.updateValue(e[negKey]! + a, forKey: negKey)
+                return (Payment(from:negKey, to: posKey, payment: a), ent)
+            }
+        }
+    }
+    return nil
+}
+
+func pairOff(_ e: Entry) -> (Payment, Entry)? {
+    var ent = e
+    if let (f, a) = e.max(by: {$0.value < $1.value}) {
+        if let (t, b) = e.min(by: {$0.value < $1.value}) {
             if a >= abs(b) {
                 ent.updateValue(e[f]! + b, forKey: f)
                 ent.removeValue(forKey: t)
@@ -150,11 +154,11 @@ func pairOff(_ e: Entry) -> (Payment, Entry)! {
     return nil
 }
 
-func reconcile(_ ent: Entry) -> [Payment] {
+func reconcile(_ pair: (Entry) -> (Payment, Entry)?, _ ent: Entry) -> [Payment] {
     var ent = ent
     var result = [Payment]()
     while ent.count >= 2 {
-        if let (p, newEvent) = pairOff(ent) {
+        if let (p, newEvent) = pair(ent) {
             ent = newEvent
             if p.payment > 0 {
                 result.append(p)
@@ -164,6 +168,20 @@ func reconcile(_ ent: Entry) -> [Payment] {
         }
     }
     return result
+}
+
+func shortList(_ ent: Entry) -> [Payment]? {
+    var paymentsList: [[Payment]] = []
+    for _ in 0..<1000 {
+        paymentsList.append(reconcile(randPair, ent))
+    }
+    let small =  paymentsList.min(by: {$0.count < $1.count})
+    let reg = reconcile(pairOff, ent)
+    if small!.count < reg.count {
+        return small
+    } else {
+        return reg
+    }
 }
 
 extension Payment : Equatable {
