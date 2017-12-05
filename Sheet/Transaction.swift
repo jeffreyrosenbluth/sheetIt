@@ -51,13 +51,14 @@ func neighbors(_ ledger: Ledger) -> Set<Ledger> {
             var newNeg = ledger.negatives
             if posElem > -negElem {
                 newPos[posIdx] = posElem + negElem
-                newNeg[negIdx] = 0
+                newNeg.remove(at: negIdx)
+
             } else if posElem < -negElem {
-                newPos[posIdx] = 0
+                newPos.remove(at: posIdx)
                 newNeg[negIdx] = posElem + negElem
             } else {
-                newPos[posIdx] = 0
-                newNeg[negIdx] = 0
+                newPos.remove(at: posIdx)
+                newNeg.remove(at: negIdx)
             }
             ledgers.insert(Ledger(positives: newPos, negatives: newNeg))
         }
@@ -86,7 +87,7 @@ class Node {
         if let p = previous {
             return 1 + p.count
         } else {
-            return 1
+            return 0
         }
     }
     
@@ -97,7 +98,21 @@ class Node {
             a.append((prev?.ledger)!)
             prev = prev?.previous
         }
-        return a
+        a.removeLast()
+        return a.reversed()
+    }
+    
+    var pmts: [(Int, Int, Int)] {
+        var ledgers = toArray
+        var ps = ledger.positives
+        var ns = ledger.negatives
+        var pIdxs = 0..<ps.count
+        var nIdxs = 0..<ns.count
+        var result: [(Int, Int, Int)] = []
+        for l in ledgers {
+            
+        }
+        return result
     }
 }
 
