@@ -27,14 +27,14 @@ struct Ledger {
 
 extension Ledger: Equatable {
     static func ==(lhs: Ledger, rhs: Ledger) -> Bool {
-        return lhs.positives.reduce(0, +) == rhs.positives.reduce(0, +) &&
-               lhs.negatives.reduce(0, +) == rhs.negatives.reduce(0, +)
+        return lhs.positives == rhs.positives &&
+               lhs.negatives == rhs.negatives
     }
 }
 
 extension Ledger: Hashable {
     var hashValue: Int {
-        let s = "\(positives.reduce(0, +))\(negatives.reduce(0, +))"
+        let s = "\(positives)\(negatives)"
         return s.hashValue
     }
 }
@@ -52,7 +52,6 @@ func neighbors(_ ledger: Ledger) -> Set<Ledger> {
             if posElem > -negElem {
                 newPos[posIdx] = posElem + negElem
                 newNeg.remove(at: negIdx)
-
             } else if posElem < -negElem {
                 newPos.remove(at: posIdx)
                 newNeg[negIdx] = posElem + negElem
@@ -101,19 +100,6 @@ class Node {
         a.removeLast()
         return a.reversed()
     }
-    
-    var pmts: [(Int, Int, Int)] {
-        var ledgers = toArray
-        var ps = ledger.positives
-        var ns = ledger.negatives
-        var pIdxs = 0..<ps.count
-        var nIdxs = 0..<ns.count
-        var result: [(Int, Int, Int)] = []
-        for l in ledgers {
-            
-        }
-        return result
-    }
 }
 
 extension Node: Equatable {
@@ -127,6 +113,36 @@ extension Node: Comparable {
         return lhs.transactions + heuristic(lhs.ledger) < rhs.transactions + heuristic(rhs.ledger)
     }
 }
+
+func delta(_ oldLedger: Ledger, _ newLedger: Ledger) {
+    let new: [Int]!
+    let old: [Int]!
+    let newZero: [Int]!
+    let oldZero: [Int]!
+    if newLedger.positives.count == oldLedger.positives.count {
+        oldZero = oldLedger.negatives
+        newZero = newLedger.negatives
+        old = oldLedger.positives
+        new = newLedger.positives
+    } else {
+        old = oldLedger.negatives
+        new = newLedger.negatives
+        oldZero = oldLedger.positives
+        newZero = newLedger.positives
+    }
+    var changed: [Int] = []
+    for (i, v) in new.enumerated() {
+        changed.append(v - old[i])
+    }
+    let diff = changed.reduce(0, +)
+    let idx = changed.index(of: diff)
+    let idxZero = oldZero.index(of: diff)
+    let from: Int!
+    let to: Int!
+    if diff < 0 {
+    }
+}
+
 
 func solve(ledger: Ledger) -> Node {
     var frontier = PriorityQueue<Node>(ascending: true)

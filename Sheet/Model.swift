@@ -106,10 +106,10 @@ struct Payment {
     let payment : Double
 }
 
-func pairs<K,V: Equatable>(pos: [K:V], neg: [K:V]) -> [(K, K)] {
+func pairs<K,V: Numeric>(pos: [K:V], neg: [K:V]) -> [(K, K)] {
     var result: [(K,K)] = []
     for (k, v) in pos {
-        if let r = neg.first(where: {$0.value == v}) {
+        if let r = neg.first(where: {$0.value == 0 - v}) {
             result.append((k, r.0))
         }
     }

@@ -23,11 +23,11 @@ class TransactionTests: XCTestCase {
     
     func testNeighbors() {
 //        let ledger = Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -20, -10, -10])
-        let ledger =  Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -20, -10, -10])
+        let ledger =  Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -31, -9])
         let sol = solve(ledger: ledger)
         print(sol.toArray)
         print(sol.count)
-
+        delta(ledger, sol.toArray[0])
     }
     
     func testExample() {
