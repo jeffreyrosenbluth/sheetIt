@@ -150,6 +150,9 @@ func reconcile(_ ent: Entry) -> [Payment] {
             neg.removeValue(forKey: kn)
             result.append(Payment(from: kn, to: kp, payment: v))
         }
+        if pos.isEmpty || neg.isEmpty {
+            return result
+        }
         if let (p, (newPos, newNeg)) = randPair((pos, neg)) {
             pos = newPos
             neg = newNeg
