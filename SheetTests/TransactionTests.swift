@@ -22,12 +22,11 @@ class TransactionTests: XCTestCase {
     }
     
     func testNeighbors() {
-//        let ledger = Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -20, -10, -10])
-        let ledger =  Ledger(positives: [99, 75, 50, 49], negatives: [-65, -50, -49, -10, -25, -25, -29, -20])
+        let ledger = Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -20, -10, -10])
+//        let ledger =  Ledger(positives: [99, 75, 50, 49, 11], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -11])
         let sol = solve(ledger: ledger)
         print(sol.toArray)
         print(sol.count)
-        delta(ledger, sol.toArray[0])
     }
     
     func testExample() {
@@ -37,8 +36,22 @@ class TransactionTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
+        let p = 6
+        let n = 6
+        let max = 1000
+        var pos: [Int] = []
+        var neg: [Int] = []
+        for _ in 0..<p {
+            pos.append(1 + Int(arc4random_uniform(UInt32(max))))
+        }
+        for _ in 0..<(n-1) {
+            neg.append(-1 - Int(arc4random_uniform(UInt32(max))))
+        }
+        neg.append(-neg.reduce(0, +) - pos.reduce(0, +))
+        print(pos)
+        print(neg)
         self.measure {
-            // Put the code you want to measure the time of here.
+            print(solve(ledger: Ledger(positives: pos, negatives: neg)).count)
         }
     }
     

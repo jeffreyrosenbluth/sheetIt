@@ -7,21 +7,14 @@
 //
 
 //import Foundation
+import GameplayKit
 
 struct Ledger {
     var positives: [Int]
     var negatives: [Int]
     
-    var posCount: Int {
-        return positives.filter({$0 > 0}).count
-    }
-    
-    var negCount: Int {
-        return negatives.filter({$0 < 0}).count
-    }
-    
     var done: Bool {
-        return negCount + posCount == 0
+        return positives.count + negatives.count == 0
     }
 }
 
@@ -40,7 +33,7 @@ extension Ledger: Hashable {
 }
 
 func heuristic(_ ledger: Ledger) -> Int {
-    return max(ledger.posCount, ledger.negCount)
+    return max(ledger.positives.count, ledger.negatives.count)
 }
 
 func neighbors(_ ledger: Ledger) -> Set<Ledger> {
@@ -114,45 +107,20 @@ extension Node: Comparable {
     }
 }
 
-func delta(_ oldLedger: Ledger, _ newLedger: Ledger) {
-    let new: [Int]!
-    let old: [Int]!
-    let newZero: [Int]!
-    let oldZero: [Int]!
-    if newLedger.positives.count == oldLedger.positives.count {
-        oldZero = oldLedger.negatives
-        newZero = newLedger.negatives
-        old = oldLedger.positives
-        new = newLedger.positives
-    } else {
-        old = oldLedger.negatives
-        new = newLedger.negatives
-        oldZero = oldLedger.positives
-        newZero = newLedger.positives
-    }
-    var changed: [Int] = []
-    for (i, v) in new.enumerated() {
-        changed.append(v - old[i])
-    }
-    let diff = changed.reduce(0, +)
-    let idx = changed.index(of: diff)
-    let idxZero = oldZero.index(of: diff)
-    let from: Int!
-    let to: Int!
-    if diff < 0 {
-    }
-}
-
-
 func solve(ledger: Ledger) -> Node {
     var frontier = PriorityQueue<Node>(ascending: true)
+    var ledgers = Set([ledger])
     frontier.push(Node(ledger))
     repeat {
         if let node = frontier.pop() {
             if node.ledger.done {return node}
-            for l in neighbors(node.ledger) {
-                if node.previous == nil || !(l == node.previous?.ledger) {
+            let ns = neighbors(node.ledger)
+            let shuffled = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: Array(ns)) as! [Ledger]
+            let group = shuffled.prefix(4)
+            for l in group {
+                if !(ledgers.contains(l)) {
                     frontier.push(Node(l, node.transactions + 1, node))
+                    ledgers.update(with: l)
                 }
             }
         }
