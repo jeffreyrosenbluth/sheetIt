@@ -110,17 +110,24 @@ extension Node: Comparable {
 func solve(ledger: Ledger) -> Node {
     var frontier = PriorityQueue<Node>(ascending: true)
     var ledgers = Set([ledger])
+    var nodesPushed = 0
+    var minNode = Node(ledger)
+    var astar = true
     frontier.push(Node(ledger))
     repeat {
         if let node = frontier.pop() {
             if node.ledger.done {return node}
-            let ns = neighbors(node.ledger)
-            let shuffled = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: Array(ns)) as! [Ledger]
-            let group = shuffled.prefix(4)
-            for l in group {
-                if !(ledgers.contains(l)) {
+            for l in neighbors(node.ledger) {
+                if !(ledgers.contains(l)) && (nodesPushed < 1000000 || astar) {
                     frontier.push(Node(l, node.transactions + 1, node))
                     ledgers.update(with: l)
+                    if l.positives.count + l.negatives.count < minNode.ledger.positives.count + minNode.ledger.negatives.count {
+                        minNode = Node(l, 0, node)
+                    }
+                    nodesPushed += 1
+                } else {
+                    astar = false
+                    frontier.push(minNode)
                 }
             }
         }

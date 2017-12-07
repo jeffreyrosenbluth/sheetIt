@@ -38,7 +38,7 @@ class TransactionTests: XCTestCase {
         // This is an example of a performance test case.
         let p = 6
         let n = 6
-        let max = 1000
+        let max = 10000
         var pos: [Int] = []
         var neg: [Int] = []
         for _ in 0..<p {
