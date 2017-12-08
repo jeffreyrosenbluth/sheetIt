@@ -23,8 +23,8 @@ class TransactionTests: XCTestCase {
     
     func testNeighbors() {
         let ledger = Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -20, -10, -10])
-//        let ledger =  Ledger(positives: [99, 75, 50, 49, 11], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -11])
-        let sol = solve(ledger: ledger)
+//        let ledger =  Ledger(positives: [99, 75], negatives: [-65, -50, -49, -10])
+        let sol = solve(comp: astarOrder, ledger: ledger)
         print(sol.toArray)
         print(sol.count)
     }
@@ -36,8 +36,8 @@ class TransactionTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        let p = 6
-        let n = 6
+        let p = 4
+        let n = 5
         let max = 10000
         var pos: [Int] = []
         var neg: [Int] = []
@@ -51,7 +51,7 @@ class TransactionTests: XCTestCase {
         print(pos)
         print(neg)
         self.measure {
-            print(solve(ledger: Ledger(positives: pos, negatives: neg)).count)
+            print(solve(comp: fastOrder, ledger: Ledger(positives: pos, negatives: neg)).count)
         }
     }
     

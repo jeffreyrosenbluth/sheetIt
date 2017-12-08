@@ -32,8 +32,12 @@ extension Ledger: Hashable {
     }
 }
 
-func heuristic(_ ledger: Ledger) -> Int {
-    return max(ledger.positives.count, ledger.negatives.count)
+func aStarHeuristic(_ ledger: Ledger) -> Int {
+        return max(ledger.positives.count, ledger.negatives.count)
+}
+
+func inconsistentHeuristic(_ ledger: Ledger) -> Int {
+    return ledger.positives.count + ledger.negatives.count
 }
 
 func neighbors(_ ledger: Ledger) -> Set<Ledger> {
@@ -103,32 +107,34 @@ extension Node: Equatable {
 
 extension Node: Comparable {
     static func <(lhs: Node, rhs: Node) -> Bool {
-        return lhs.transactions + heuristic(lhs.ledger) < rhs.transactions + heuristic(rhs.ledger)
+        return lhs.transactions + aStarHeuristic(lhs.ledger) < rhs.transactions + aStarHeuristic(rhs.ledger)
     }
 }
 
-func solve(ledger: Ledger) -> Node {
-    var frontier = PriorityQueue<Node>(ascending: true)
+func astarOrder(_ lhs: Node, _ rhs: Node) -> Bool {
+    return lhs.transactions + aStarHeuristic(lhs.ledger) > rhs.transactions + aStarHeuristic(rhs.ledger)
+}
+
+func fastOrder(_ lhs: Node, _ rhs: Node) -> Bool {
+    return lhs.transactions + inconsistentHeuristic(lhs.ledger) > rhs.transactions + inconsistentHeuristic(rhs.ledger)
+}
+
+func solve(comp: @escaping (Node, Node) -> Bool, ledger: Ledger) -> Node {
+    var frontier = PriorityQueue<Node>(order: comp)
     var ledgers = Set([ledger])
-    var nodesPushed = 0
     var minNode = Node(ledger)
-    var astar = true
     frontier.push(Node(ledger))
     repeat {
         if let node = frontier.pop() {
             if node.ledger.done {return node}
             for l in neighbors(node.ledger) {
-                if !(ledgers.contains(l)) && (nodesPushed < 1000000 || astar) {
+                if !(ledgers.contains(l)) {
                     frontier.push(Node(l, node.transactions + 1, node))
                     ledgers.update(with: l)
                     if l.positives.count + l.negatives.count < minNode.ledger.positives.count + minNode.ledger.negatives.count {
                         minNode = Node(l, 0, node)
                     }
-                    nodesPushed += 1
-                } else {
-                    astar = false
-                    frontier.push(minNode)
-                }
+                } 
             }
         }
     } while true
