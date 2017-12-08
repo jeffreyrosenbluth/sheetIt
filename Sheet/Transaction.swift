@@ -9,9 +9,10 @@
 //import Foundation
 import GameplayKit
 
-struct Ledger {
-    var positives: [Int]
-    var negatives: [Int]
+struct Ledger<T: Hashable> {
+    var positives: [T: Int]
+    var negatives: [T: Int]
+    let trx: (T,T,Int)?
     
     var done: Bool {
         return positives.count + negatives.count == 0
@@ -32,48 +33,48 @@ extension Ledger: Hashable {
     }
 }
 
-func aStarHeuristic(_ ledger: Ledger) -> Int {
+func aStarHeuristic<T>(_ ledger: Ledger<T>) -> Int {
         return max(ledger.positives.count, ledger.negatives.count)
 }
 
-func inconsistentHeuristic(_ ledger: Ledger) -> Int {
+func inconsistentHeuristic<T>(_ ledger: Ledger<T>) -> Int {
     return ledger.positives.count + ledger.negatives.count
 }
 
-func neighbors(_ ledger: Ledger) -> Set<Ledger> {
-    var ledgers: Set<Ledger> = []
-    for (posIdx, posElem) in ledger.positives.enumerated() {
-        for (negIdx, negElem) in ledger.negatives.enumerated() {
+func neighbors<T>(_ ledger: Ledger<T>) -> Set<Ledger<T>> {
+    var ledgers: Set<Ledger<T>> = []
+    for (posIdx, posElem) in ledger.positives {
+        for (negIdx, negElem) in ledger.negatives {
             var newPos = ledger.positives
             var newNeg = ledger.negatives
             if posElem > -negElem {
                 newPos[posIdx] = posElem + negElem
-                newNeg.remove(at: negIdx)
+                newNeg.removeValue(forKey: negIdx)
             } else if posElem < -negElem {
-                newPos.remove(at: posIdx)
+                newPos.removeValue(forKey: posIdx)
                 newNeg[negIdx] = posElem + negElem
             } else {
-                newPos.remove(at: posIdx)
-                newNeg.remove(at: negIdx)
+                newPos.removeValue(forKey: posIdx)
+                newNeg.removeValue(forKey: negIdx)
             }
-            ledgers.insert(Ledger(positives: newPos, negatives: newNeg))
+            ledgers.insert(Ledger(positives: newPos, negatives: newNeg, trx: (negIdx, posIdx, posElem)))
         }
     }
     return ledgers
 }
 
-class Node {
-    let ledger: Ledger
+class Node<T: Hashable> {
+    let ledger: Ledger<T>
     let transactions: Int
     let previous: Node?
     
-    init(_ ledger: Ledger) {
+    init(_ ledger: Ledger<T>) {
         self.ledger = ledger
         self.transactions = 0
         self.previous = nil
     }
     
-    init(_ ledger: Ledger, _ transactions: Int, _ previous: Node?) {
+    init(_ ledger: Ledger<T>, _ transactions: Int, _ previous: Node?) {
         self.ledger = ledger
         self.transactions = transactions
         self.previous = previous
@@ -87,7 +88,7 @@ class Node {
         }
     }
     
-    var toArray: [Ledger] {
+    var toArray: [Ledger<T>] {
         var a = [ledger]
         var prev = previous
         while prev != nil {
@@ -111,15 +112,15 @@ extension Node: Comparable {
     }
 }
 
-func astarOrder(_ lhs: Node, _ rhs: Node) -> Bool {
+func astarOrder<T>(_ lhs: Node<T>, _ rhs: Node<T>) -> Bool {
     return lhs.transactions + aStarHeuristic(lhs.ledger) > rhs.transactions + aStarHeuristic(rhs.ledger)
 }
 
-func fastOrder(_ lhs: Node, _ rhs: Node) -> Bool {
+func fastOrder<T>(_ lhs: Node<T>, _ rhs: Node<T>) -> Bool {
     return lhs.transactions + inconsistentHeuristic(lhs.ledger) > rhs.transactions + inconsistentHeuristic(rhs.ledger)
 }
 
-func solve(comp: @escaping (Node, Node) -> Bool, ledger: Ledger) -> Node {
+func solve<T>(comp: @escaping (Node<T>, Node<T>) -> Bool, ledger: Ledger<T>) -> Node<T> {
     var frontier = PriorityQueue<Node>(order: comp)
     var ledgers = Set([ledger])
     var minNode = Node(ledger)

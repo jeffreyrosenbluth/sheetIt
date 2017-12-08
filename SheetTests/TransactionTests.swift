@@ -22,9 +22,11 @@ class TransactionTests: XCTestCase {
     }
     
     func testNeighbors() {
-        let ledger = Ledger(positives: [99, 75, 50, 49, 40], negatives: [-65, -50, -49, -10, -25, -25, -29, -20, -20, -10, -10])
+        let ledger: Ledger<String> = Ledger(positives: ["A":99, "B":75, "C":50, "D":49, "E":40],
+                            negatives: ["F":-65, "G":-50, "H":-49, "I":-10, "J":-25, "K":-25, "L":-29, "M":-20, "N":-20, "O":-10, "P":-10],
+                            trx: nil)
 //        let ledger =  Ledger(positives: [99, 75], negatives: [-65, -50, -49, -10])
-        let sol = solve(comp: astarOrder, ledger: ledger)
+        let sol = solve(comp: fastOrder, ledger: ledger)
         print(sol.toArray)
         print(sol.count)
     }
@@ -39,19 +41,19 @@ class TransactionTests: XCTestCase {
         let p = 4
         let n = 5
         let max = 10000
-        var pos: [Int] = []
-        var neg: [Int] = []
-        for _ in 0..<p {
-            pos.append(1 + Int(arc4random_uniform(UInt32(max))))
+        var pos: [String:Int] = [:]
+        var neg: [String:Int] = [:]
+        for i in 0..<p {
+            pos.updateValue(1 + Int(arc4random_uniform(UInt32(max))), forKey: "P\(i)")
         }
-        for _ in 0..<(n-1) {
-            neg.append(-1 - Int(arc4random_uniform(UInt32(max))))
+        for j in 0..<(n-1) {
+            neg.updateValue(1 + Int(arc4random_uniform(UInt32(max))), forKey: "N\(j)")
         }
-        neg.append(-neg.reduce(0, +) - pos.reduce(0, +))
+        neg.updateValue(-neg.values.reduce(0, +) - pos.values.reduce(0, +), forKey: "N\(n)")
         print(pos)
         print(neg)
         self.measure {
-            print(solve(comp: fastOrder, ledger: Ledger(positives: pos, negatives: neg)).count)
+            print(solve(comp: fastOrder, ledger: Ledger<String>(positives: pos, negatives: neg, trx: nil)).count)
         }
     }
     
