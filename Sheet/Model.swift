@@ -170,6 +170,22 @@ func shortList(_ ent: Entry) -> [Payment]? {
     return paymentsList.min(by: {$0.count < $1.count})
 }
 
+func reconcileAstar(_ ent: Entry) -> [Payment]? {
+    let l = toLedger(ent)
+    let s = solve(comp: astarOrder, ledger: l)
+    return s.toArray.map({toPayment($0.trx!)})
+}
+
+func toLedger(_ ent: Entry) -> Ledger<Person> {
+    let pos = ent.filter({$0.value > 0}).mapValues({Int($0 * 100)})
+    let neg = ent.filter({$0.value < 0}).mapValues({Int($0 * -100)})
+    return Ledger(positives: pos, negatives: neg, trx: nil)
+}
+
+func toPayment(_ triple: (Person, Person, Int)) -> Payment {
+    return Payment(from: triple.0, to: triple.1, payment: Double(triple.2) / 100.0)
+}
+
 extension Payment : Equatable {
     static func ==(lhs: Payment, rhs: Payment) -> Bool {
         let eq =

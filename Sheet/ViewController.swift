@@ -67,7 +67,12 @@ class ViewController: UITableViewController, UITextFieldDelegate {
     
     @objc func settleTapped() {
         if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
-            pvc.payments = shortList(total(currentSheet))?.sorted(by: {$0.payment >= $1.payment})
+            let entry = total(currentSheet)
+            if entry.count > 8 {
+                pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
+            } else {
+                pvc.payments = reconcileAstar(entry)?.sorted(by: {$0.payment >= $1.payment})
+            }
             navigationController?.pushViewController(pvc, animated: true)
         }
     }

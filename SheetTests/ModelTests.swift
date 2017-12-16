@@ -19,12 +19,6 @@ class ModelTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-//        john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
-//        paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
-//        george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
-//        ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
-//        bowling = Event(eventID: UUID(), description: "Bowling", date: Date.init(timeIntervalSinceNow: 10), payer: john, participants: [john, paul, ringo, george], amount: 120)
-//        skiing = Event(eventID: UUID(), description: "Skiing at Jackson Hole", date: Date(timeIntervalSinceNow: 11), payer: ringo, participants: [george, ringo], amount: 900)
     }
     
     override func tearDown() {
@@ -52,7 +46,12 @@ class ModelTests: XCTestCase {
     }
     
     func testReconcile() {
-//        XCTAssertEqual((reconcile(total([bowling, skiing]))[1].payment), 60.0)
+        func p(_ name: String) -> Person {
+            return Person(name: name, email: nil)
+        }
+        let entry = [p("A"):99.0, p("B"):75.0, p("C"):50.0, p("D"):49.0, p("E"):40.0,
+                      p("F"):-65.0, p("G"):-50.0, p("H"):-49.0, p("I"):-10.0, p("J"):-25.0, p("K"):-25.0, p("L"):-29.0, p("M"):-20.0, p("N"):-20.0, p("O"):-10.0, p("P"):-10.0]
+        print(shortList(entry)?.count)
     }
     
 }

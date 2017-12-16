@@ -14,8 +14,12 @@ struct Ledger<T: Hashable> {
     var negatives: [T: Int]
     let trx: (T,T,Int)?
     
+    var count: Int {
+        return positives.count + negatives.count
+    }
+    
     var done: Bool {
-        return positives.count + negatives.count == 0
+        return count == 0
     }
 }
 
@@ -34,30 +38,34 @@ extension Ledger: Hashable {
 }
 
 func aStarHeuristic<T>(_ ledger: Ledger<T>) -> Int {
-        return max(ledger.positives.count, ledger.negatives.count)
+    return max(ledger.positives.count, ledger.negatives.count)
 }
 
 func inconsistentHeuristic<T>(_ ledger: Ledger<T>) -> Int {
-    return ledger.positives.count + ledger.negatives.count
+    return ledger.positives.count + ledger.negatives.count - 1
 }
 
 func neighbors<T>(_ ledger: Ledger<T>) -> Set<Ledger<T>> {
     var ledgers: Set<Ledger<T>> = []
+    var trxAmount: Int
     for (posIdx, posElem) in ledger.positives {
         for (negIdx, negElem) in ledger.negatives {
             var newPos = ledger.positives
             var newNeg = ledger.negatives
-            if posElem > -negElem {
-                newPos[posIdx] = posElem + negElem
+            if posElem > negElem {
+                newPos[posIdx] = posElem - negElem
                 newNeg.removeValue(forKey: negIdx)
-            } else if posElem < -negElem {
+                trxAmount = negElem
+            } else if posElem < negElem {
                 newPos.removeValue(forKey: posIdx)
-                newNeg[negIdx] = posElem + negElem
+                newNeg[negIdx] = negElem - posElem
+                trxAmount = posElem
             } else {
                 newPos.removeValue(forKey: posIdx)
                 newNeg.removeValue(forKey: negIdx)
+                trxAmount = posElem
             }
-            ledgers.insert(Ledger(positives: newPos, negatives: newNeg, trx: (negIdx, posIdx, posElem)))
+            ledgers.insert(Ledger(positives: newPos, negatives: newNeg, trx: (negIdx, posIdx, trxAmount)))
         }
     }
     return ledgers
@@ -123,7 +131,6 @@ func fastOrder<T>(_ lhs: Node<T>, _ rhs: Node<T>) -> Bool {
 func solve<T>(comp: @escaping (Node<T>, Node<T>) -> Bool, ledger: Ledger<T>) -> Node<T> {
     var frontier = PriorityQueue<Node>(order: comp)
     var ledgers = Set([ledger])
-    var minNode = Node(ledger)
     frontier.push(Node(ledger))
     repeat {
         if let node = frontier.pop() {
@@ -132,10 +139,7 @@ func solve<T>(comp: @escaping (Node<T>, Node<T>) -> Bool, ledger: Ledger<T>) -> 
                 if !(ledgers.contains(l)) {
                     frontier.push(Node(l, node.transactions + 1, node))
                     ledgers.update(with: l)
-                    if l.positives.count + l.negatives.count < minNode.ledger.positives.count + minNode.ledger.negatives.count {
-                        minNode = Node(l, 0, node)
-                    }
-                } 
+                }
             }
         }
     } while true
