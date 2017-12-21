@@ -68,12 +68,11 @@ class ViewController: UITableViewController, UITextFieldDelegate {
     @objc func settleTapped() {
         if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
             let entry = total(currentSheet)
-            if entry.count > 8 {
+            if entry.count >= 15 {
                 pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
             } else {
                 let l = toLedger(entry)
                 pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
-//                pvc.payments = reconcileAstar(entry)?.sorted(by: {$0.payment >= $1.payment})
             }
             navigationController?.pushViewController(pvc, animated: true)
         }

@@ -66,8 +66,8 @@ class TransactionTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        let p = 5
-        let n = 5
+        let p = 7
+        let n = 7
         let max = 10000
         var pos: [Person:Int] = [:]
         var neg: [Person:Int] = [:]
@@ -80,7 +80,7 @@ class TransactionTests: XCTestCase {
         let posSum = pos.values.reduce(0, +)
         let negSum = neg.values.reduce(0, +)
         if posSum > negSum {
-            neg.updateValue(-neg.values.reduce(0, +) + pos.values.reduce(0, +), forKey: q("N\(n)"))
+            neg.updateValue(-neg.values.reduce(0, +) + pos.values.reduce(0, +), forKey: q("P\(n)"))
         } else {
             pos.updateValue(neg.values.reduce(0, +) - pos.values.reduce(0, +), forKey: q("N\(n)"))
         }
