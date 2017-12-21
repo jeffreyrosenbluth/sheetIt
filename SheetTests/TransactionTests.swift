@@ -30,6 +30,35 @@ class TransactionTests: XCTestCase {
         print(sol.count)
     }
     
+    func testPowerset() {
+        let set = [1,2,3]
+        let ps = powerSet(set)
+        print(set)
+        print(ps)
+        let ips = indexedPowerSet(ps, 3)
+        print(ips)
+    }
+    
+    func testSummands() {
+        print(summands(5))
+    }
+    
+    func q(_ name: String) -> Person {
+        return Person(name: name, email: nil)
+    }
+    
+    func testTrxs() {
+        func p(_ name: String) -> Person {
+            return Person(name: name, email: nil)
+        }
+        let ledger: Ledger<Person> = Ledger<Person>(positives: [p("A"):99, p("B"):75, p("C"):50, p("D"):49, p("E"):40],
+                                            negatives: [p("F"):65, p("G"):50, p("H"):49, p("I"):10, p("J"):25, p("K"):25, p("L"):29, p("M"):20, p("N"):20, p("O"):10, p("P"):10],
+                                            trx: nil)
+        let r = reconcileLedgerOpt(ledger)
+        print(r)
+        print(r.count)
+    }
+    
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -37,28 +66,30 @@ class TransactionTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        let p = 3
-        let n = 4
+        let p = 5
+        let n = 5
         let max = 10000
-        var pos: [String:Int] = [:]
-        var neg: [String:Int] = [:]
+        var pos: [Person:Int] = [:]
+        var neg: [Person:Int] = [:]
         for i in 0..<p {
-            pos.updateValue(1 + Int(arc4random_uniform(UInt32(max))), forKey: "P\(i)")
+            pos.updateValue(1 + Int(arc4random_uniform(UInt32(max))), forKey:  q("P\(i)"))
         }
         for j in 0..<n {
-            neg.updateValue(1 + Int(arc4random_uniform(UInt32(max))), forKey: "N\(j)")
+            neg.updateValue(1 + Int(arc4random_uniform(UInt32(max))), forKey: q("N\(j)"))
         }
         let posSum = pos.values.reduce(0, +)
         let negSum = neg.values.reduce(0, +)
         if posSum > negSum {
-            neg.updateValue(-neg.values.reduce(0, +) + pos.values.reduce(0, +), forKey: "N\(n)")
+            neg.updateValue(-neg.values.reduce(0, +) + pos.values.reduce(0, +), forKey: q("N\(n)"))
         } else {
-            pos.updateValue(neg.values.reduce(0, +) - pos.values.reduce(0, +), forKey: "N\(n)")
+            pos.updateValue(neg.values.reduce(0, +) - pos.values.reduce(0, +), forKey: q("N\(n)"))
         }
         print(pos)
         print(neg)
         self.measure {
-            print(solve(comp: astarOrder, ledger: Ledger<String>(positives: pos, negatives: neg, trx: nil)).count)
+            print(reconcileLedgerOpt(Ledger<Person>(positives: pos, negatives: neg, trx: nil)).count)
+//            print(solve(comp: astarOrder, ledger: Ledger<String>(positives: pos, negatives: neg, trx: nil)).count)
+
         }
     }
     

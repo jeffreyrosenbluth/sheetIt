@@ -71,7 +71,9 @@ class ViewController: UITableViewController, UITextFieldDelegate {
             if entry.count > 8 {
                 pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
             } else {
-                pvc.payments = reconcileAstar(entry)?.sorted(by: {$0.payment >= $1.payment})
+                let l = toLedger(entry)
+                pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
+//                pvc.payments = reconcileAstar(entry)?.sorted(by: {$0.payment >= $1.payment})
             }
             navigationController?.pushViewController(pvc, animated: true)
         }
