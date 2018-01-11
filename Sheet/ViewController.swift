@@ -26,18 +26,25 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
         navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
         navigationController?.navigationBar.prefersLargeTitles = true
-        let addParticipantButton = UIBarButtonItem(title: "Sheets", style: .plain,  target: self, action: #selector(sheetsTapped))
-        addParticipantButton.tintColor = textColor
+        let sheetsButton = UIBarButtonItem(title: "Sheets", style: .plain,  target: self, action: #selector(sheetsTapped))
+        sheetsButton.tintColor = textColor
         let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
         settleButton.tintColor = textColor
+        let addMemberButton = UIBarButtonItem(title: "Add Member", style: .plain, target: self, action: #selector(participantTapped))
+        addMemberButton.tintColor = textColor
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
-        navigationItem.rightBarButtonItem = addEventButton
+        navigationItem.rightBarButtonItems = [addEventButton, space, addMemberButton]
         navigationItem.leftBarButtonItem = self.editButtonItem
-        toolbarItems = [addParticipantButton, space, settleButton]
+        toolbarItems = [sheetsButton, space, settleButton]
         let sheetNames = UserDefaults.standard.object(forKey:"SavedSheets") as? [String] ?? [String]()
-        currentSheet = readSheet(sheetNames[0])
- 
+        let sheetIndex = UserDefaults.standard.integer(forKey: "Index")
+        if sheetNames == [] {
+            currentSheet = Sheet()
+        } else {
+            currentSheet = readSheet(sheetNames[sheetIndex])
+            title = sheetNames[sheetIndex]
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -47,6 +54,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     
     func dataChanged(_ sheet: String) {
         sheetName = sheet
+        title = sheet
         currentSheet = readSheet(sheet)
         tableView.reloadData()
     }
@@ -93,6 +101,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     @objc func entryTapped() {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? EntryViewController {
             evc.currentSheet = currentSheet
+            evc.sheetName = sheetName
             navigationController?.pushViewController(evc, animated: true)
             }
     }
@@ -112,6 +121,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             t.clearButtonMode = .always
             t.delegate = self
         }
+        
         func add(a: UIAlertAction) {
             if let name = participantAlertController.textFields?[0].text {
                 if name != ""  {
@@ -120,6 +130,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
                 }
             }
         }
+        
         participantAlertController.addTextField(configurationHandler: getName)
         nameField = participantAlertController.textFields![0]
         participantAlertController.addAction(UIAlertAction(title: "Add", style: .default, handler: add))

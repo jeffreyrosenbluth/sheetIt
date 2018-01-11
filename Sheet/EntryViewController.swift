@@ -11,6 +11,7 @@ import UIKit
 class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate  {
     
     var currentSheet = Sheet()
+    var sheetName = ""
     var selectedPeople: Set<Int> = []
     var payerIndex = -1
 
@@ -50,7 +51,7 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: payment)
         if event.valid {
             currentSheet.events.append(event)
-            writeSheet(name: "sheetit", sheet: currentSheet)
+            writeSheet(name: sheetName, sheet: currentSheet)
         }
         navigationController?.popViewController(animated: true)
     }
