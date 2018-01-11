@@ -170,16 +170,10 @@ func shortList(_ ent: Entry) -> [Payment]? {
     return paymentsList.min(by: {$0.count < $1.count})
 }
 
-func reconcileAstar(_ ent: Entry) -> [Payment]? {
-    let l = toLedger(ent)
-    let s = solve(comp: astarOrder, ledger: l)
-    return s.toArray.map({toPayment($0.trx!)})
-}
-
 func toLedger(_ ent: Entry) -> Ledger<Person> {
     let pos = ent.filter({$0.value > 0}).mapValues({Int($0 * 100)})
     let neg = ent.filter({$0.value < 0}).mapValues({Int($0 * -100)})
-    return Ledger(positives: pos, negatives: neg, trx: nil)
+    return Ledger(positives: pos, negatives: neg)
 }
 
 func toPayment(_ triple: (Person, Person, Int)) -> Payment {
@@ -201,12 +195,12 @@ func getDocumentsDirectory() -> URL {
     return paths[0]
 }
 
-func getSheetItURL() -> URL {
-    return getDocumentsDirectory().appendingPathComponent("sheetit")
+func getSheetItURL(_ name: String) -> URL {
+    return getDocumentsDirectory().appendingPathComponent(name)
 }
 
-func writeSheet(_ sheet: Sheet) {
-    let url = getSheetItURL()
+func writeSheet(name: String, sheet: Sheet) {
+    let url = getSheetItURL(name)
     let encoder = JSONEncoder()
     do {
         let json = try encoder.encode(sheet)
@@ -216,8 +210,8 @@ func writeSheet(_ sheet: Sheet) {
     }
 }
 
-func readSheet() -> Sheet {
-    let url = getSheetItURL()
+func readSheet(_ name: String) -> Sheet {
+    let url = getSheetItURL(name)
     do {
         let data = try Data(contentsOf: url)
         let sheet = try JSONDecoder().decode(Sheet.self, from: data)

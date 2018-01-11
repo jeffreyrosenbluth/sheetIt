@@ -8,9 +8,12 @@
 
 import UIKit
 
-class ViewController: UITableViewController, UITextFieldDelegate {
+class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
     
-    var currentSheet = readSheet()
+    
+    
+    var currentSheet: Sheet!
+    var sheetName: String!
     var nameField = UITextField()
     var nickField = UITextField()
     
@@ -23,7 +26,7 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
         navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
         navigationController?.navigationBar.prefersLargeTitles = true
-        let addParticipantButton = UIBarButtonItem(title: "Add Member", style: .plain,  target: self, action: #selector(participantTapped))
+        let addParticipantButton = UIBarButtonItem(title: "Sheets", style: .plain,  target: self, action: #selector(sheetsTapped))
         addParticipantButton.tintColor = textColor
         let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
         settleButton.tintColor = textColor
@@ -32,13 +35,22 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         navigationItem.rightBarButtonItem = addEventButton
         navigationItem.leftBarButtonItem = self.editButtonItem
         toolbarItems = [addParticipantButton, space, settleButton]
+        let sheetNames = UserDefaults.standard.object(forKey:"SavedSheets") as? [String] ?? [String]()
+        currentSheet = readSheet(sheetNames[0])
+ 
     }
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.toolbar.isHidden = false
         tableView.reloadData()
     }
-
+    
+    func dataChanged(_ sheet: String) {
+        sheetName = sheet
+        currentSheet = readSheet(sheet)
+        tableView.reloadData()
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currentSheet.events.count
     }
@@ -49,7 +61,7 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         cell.detailTextLabel?.text = String(format: "$%.02f", currentSheet.events[indexPath.row].amount)
         return cell
     }
-    
+        
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Sheet") as? SheetViewController {
             evc.selectedEvent = currentSheet.events[indexPath.row]
@@ -61,14 +73,14 @@ class ViewController: UITableViewController, UITextFieldDelegate {
         if editingStyle == .delete {
             currentSheet.events.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            writeSheet(currentSheet)
+            writeSheet(name: sheetName, sheet: currentSheet)
         }
     }
     
     @objc func settleTapped() {
         if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
             let entry = total(currentSheet)
-            if entry.count >= 15 {
+            if entry.count > 15 {
                 pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
             } else {
                 let l = toLedger(entry)
@@ -85,6 +97,13 @@ class ViewController: UITableViewController, UITextFieldDelegate {
             }
     }
     
+    @objc func sheetsTapped() {
+        if let svc = storyboard?.instantiateViewController(withIdentifier: "Sheets") as? SheetsViewController {
+            svc.delegate = self
+            navigationController?.pushViewController(svc, animated: true)
+        }
+    }
+    
     @objc func participantTapped() {
         let participantAlertController = UIAlertController(title: "New Participant", message: nil, preferredStyle: .alert)
         
@@ -97,7 +116,7 @@ class ViewController: UITableViewController, UITextFieldDelegate {
             if let name = participantAlertController.textFields?[0].text {
                 if name != ""  {
                     currentSheet.people.append(Person(name: name, email: nil))
-                    writeSheet(currentSheet)
+                    writeSheet(name: sheetName, sheet: currentSheet)
                 }
             }
         }

@@ -21,14 +21,6 @@ class TransactionTests: XCTestCase {
         super.tearDown()
     }
     
-    func testNeighbors() {
-        let ledger: Ledger<String> = Ledger(positives: ["A":99, "B":75, "C":50, "D":49, "E":40],
-                            negatives: ["F":65, "G":50, "H":49, "I":10, "J":25, "K":25, "L":29, "M":20, "N":20, "O":10, "P":10],
-                            trx: nil)
-        let sol = solve(comp: fastOrder, ledger: ledger)
-        print(sol.toArray.map({$0.trx}))
-        print(sol.count)
-    }
     
     func testPowerset() {
         let set = [1,2,3]
@@ -52,21 +44,19 @@ class TransactionTests: XCTestCase {
             return Person(name: name, email: nil)
         }
         let ledger: Ledger<Person> = Ledger<Person>(positives: [p("A"):99, p("B"):75, p("C"):50, p("D"):49, p("E"):40],
-                                            negatives: [p("F"):65, p("G"):50, p("H"):49, p("I"):10, p("J"):25, p("K"):25, p("L"):29, p("M"):20, p("N"):20, p("O"):10, p("P"):10],
-                                            trx: nil)
+                                            negatives: [p("F"):65, p("G"):50, p("H"):49, p("I"):10, p("J"):25, p("K"):25, p("L"):29, p("M"):20, p("N"):20, p("O"):10, p("P"):10])
         let r = reconcileLedgerOpt(ledger)
         print(r)
         print(r.count)
     }
     
     func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        print(11/2)
     }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        let p = 7
+        let p = 8
         let n = 7
         let max = 10000
         var pos: [Person:Int] = [:]
@@ -87,7 +77,7 @@ class TransactionTests: XCTestCase {
         print(pos)
         print(neg)
         self.measure {
-            print(reconcileLedgerOpt(Ledger<Person>(positives: pos, negatives: neg, trx: nil)).count)
+            print(reconcileLedgerOpt(Ledger<Person>(positives: pos, negatives: neg)).count)
 //            print(solve(comp: astarOrder, ledger: Ledger<String>(positives: pos, negatives: neg, trx: nil)).count)
 
         }

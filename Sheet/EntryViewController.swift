@@ -50,7 +50,7 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: payment)
         if event.valid {
             currentSheet.events.append(event)
-            writeSheet(currentSheet)
+            writeSheet(name: "sheetit", sheet: currentSheet)
         }
         navigationController?.popViewController(animated: true)
     }
@@ -90,7 +90,6 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
             if cell.accessoryType == .checkmark && indexPath.row == payerIndex {
                 cell.accessoryType = .none
-                //                payerIndex = -1
                 selectedPeople.remove(indexPath.row)
                 tableView.reloadData()
             }
