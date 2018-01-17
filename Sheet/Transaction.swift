@@ -63,15 +63,22 @@ func summands(_ n: Int) -> [(Int, Int)] {
     return result
 }
 
+// Calculate the optimal set of transactions from a Ledger.
 func trxs<T>(_ ledger: Ledger<T>) -> [([T], [T])] {
     var result: [([T], [T])] = []
+    // Start by creating two arrays, one of the keys of the positive entries
+    // and one of the keys of the negative entryies.
     let pos = Array(ledger.positives.keys)
     let neg = Array(ledger.negatives.keys)
+    // Create indexed power sets for each, i.e. divide the power set amongst buckets
+    // according to the count of each set. Such that the count becomes the index in an array.
     let pSet = indexedPowerSet(powerSet(pos), pos.count)
     let nSet = indexedPowerSet(powerSet(neg), neg.count)
     let n = pos.count + neg.count - 2
+    // Keep track of the keys of settled transactions.
     var used = Set<T>()
-    if n < 2 { return [(pos, neg)]}
+    // If n < 2 then there are at most 3 keys and the pos keys are simply paired with the neg keys.
+    if n < 2 { return [(pos, neg)] }
     for i in 2...n {
         let idxs = summands(i)
         for (j, k) in idxs {

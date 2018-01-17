@@ -42,8 +42,9 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         if sheetNames == [] {
             currentSheet = Sheet()
         } else {
-            currentSheet = readSheet(sheetNames[sheetIndex])
-            title = sheetNames[sheetIndex]
+            sheetName = sheetNames[sheetIndex]
+            currentSheet = readSheet(sheetName)
+            title = sheetName
         }
     }
     
