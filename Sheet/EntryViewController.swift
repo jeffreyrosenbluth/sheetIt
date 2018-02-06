@@ -35,7 +35,6 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func doneTapped() {
-//        let payerIndex = payerPicker.selectedRow(inComponent: 0)
         if payerIndex < 0 {
             navigationController?.popViewController(animated: true)
             return
@@ -83,18 +82,24 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         } else {
             cell.textLabel?.text = "⚪️ \(currentSheet.people[indexPath.row].name)"
         }
+        if selectedPeople.contains(indexPath.row) {
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
-            if cell.accessoryType == .checkmark && indexPath.row == payerIndex {
+            let isParticipant = selectedPeople.contains(indexPath.row)
+            if isParticipant && indexPath.row == payerIndex {
                 cell.accessoryType = .none
                 selectedPeople.remove(indexPath.row)
                 tableView.reloadData()
             }
-            else if cell.accessoryType == .checkmark {
+            else if isParticipant {
                 payerIndex = indexPath.row
                 tableView.reloadData()
             }
