@@ -50,6 +50,7 @@ class EntryViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let event = Event(eventID: UUID(), description: desc.text!, date: datePicker.date, payer: payer, participants: participants, amount: payment)
         if event.valid {
             currentSheet.events.append(event)
+            currentSheet.events.sort(by: {$0.date < $1.date})
             writeSheet(name: sheetName, sheet: currentSheet)
         }
         navigationController?.popViewController(animated: true)
