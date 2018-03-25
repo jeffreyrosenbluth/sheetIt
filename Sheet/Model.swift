@@ -9,34 +9,26 @@
 import Foundation
 
 struct Person: Codable {
-    let personID : UUID
     let name : String
-    let nick : String
-}
-
-extension Person: CustomStringConvertible {
-    var description: String {
-        return nick
-    }
+    let email : String?
 }
 
 extension Person: Equatable {
     static func ==(lhs: Person, rhs: Person) -> Bool {
         let eq =
-            lhs.personID == rhs.personID &&
             lhs.name == rhs.name &&
-            lhs.nick == rhs.nick
+            lhs.email == rhs.email
         return eq
     }
 }
 
 extension Person: Hashable {
     var hashValue: Int {
-        return personID.hashValue
+        return name.hashValue
     }
 }
 
-let noOne = Person(personID: UUID(), name: "No One", nick: "XX")
+let noOne = Person(name: "No One", email: nil)
 
 typealias Entry = [Person: Double]
 
@@ -54,8 +46,20 @@ struct Event: Codable {
         for participant in participants {
             e[participant] = owe
         }
-        e.updateValue(e[payer]! + amount, forKey: payer)
+        if let payerShare = e[payer] {
+            e.updateValue(payerShare + amount, forKey: payer)
+        } else {
+            e[payer] = amount
+        }
         return e
+    }
+    
+    var valid: Bool {
+        if description == "" || amount <= 0 || participants == [] {
+            return false
+        } else {
+            return true
+        }
     }
 }
 
@@ -72,14 +76,13 @@ extension Event : Equatable {
     }
 }
 
-//typealias Sheet = [Event]
-struct Sheet: Codable {
-    let people: [Person]
-    let events: [Event]
-}
-
-func deleteEntry(sheet: Sheet, id: UUID) -> Sheet {
-    return Sheet(people: sheet.people, events: sheet.events.filter {$0.eventID != id})
+class Sheet: Codable {
+    var people = [Person]()
+    var events = [Event]()
+    
+    func deleteEntry(sheet: Sheet, id: UUID) {
+        sheet.events = sheet.events.filter({$0.eventID != id})
+    }
 }
 
 func total(_ sheet: Sheet) -> Entry {
@@ -97,68 +100,84 @@ func total(_ sheet: Sheet) -> Entry {
     return result
 }
 
-func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)? {
-    func ans(_ dict: [K: V]) -> (K, V)? {
-        guard dict.count > 0 else {return nil}
-        var result: (K, V)! = nil
-        for (k, v) in dict {
-            if let r = result {
-                if comp(v, r.1) {
-                    result = (k, v)
-                }
-            } else {
-                result = (k, v)
-            }
-        }
-        return result
-    }
-    return ans
-}
-
-func minValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
-    return extremum(comp: <)(dict)
-}
-
-func maxValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
-    return extremum(comp: >)(dict)
-}
-
 struct Payment {
     let from : Person
     let to : Person
     let payment : Double
 }
 
-func pairOff(_ e: Entry) -> (Payment, Entry)! {
-    var ent = e
-    if let (f, a) = maxValue(e) {
-        if let (t, b) = minValue(e) {
-            if a >= abs(b) {
-                ent.updateValue(e[f]! + b, forKey: f)
-                ent.removeValue(forKey: t)
-                return (Payment(from: t, to: f, payment: -b), ent)
-            } else {
-                ent.removeValue(forKey: f)
-                ent.updateValue(e[t]! + a, forKey: t)
-                return (Payment(from:t, to: f, payment: a), ent)
-            }
-        }
-    }
-    return nil
-}
-
-func reconcile(_ ent: Entry) -> [Payment] {
-    var ent = ent
-    var result = [Payment]()
-    while ent.count >= 2 {
-        if let (p, newEvent) = pairOff(ent) {
-            ent = newEvent
-            result.append(p)
-        } else {
-            return [Payment(from: noOne, to: noOne, payment: 0)]
+func pairs<K,V: Numeric>(pos: [K:V], neg: [K:V]) -> [(K, K)] {
+    var result: [(K,K)] = []
+    for (k, v) in pos {
+        if let r = neg.first(where: {$0.value == 0 - v}) {
+            result.append((k, r.0))
         }
     }
     return result
+}
+
+func randPair(_ e: (Entry, Entry)) -> (Payment, (Entry, Entry))? {
+    var (pos, neg) = e
+    let negIdx = Int(arc4random_uniform(UInt32(neg.count)))
+    let posIdx = Int(arc4random_uniform(UInt32(pos.count)))
+    let negKey = Array(neg.keys)[negIdx]
+    let posKey = Array(pos.keys)[posIdx]
+    guard let a = pos[posKey] else {return nil}
+    guard let b = neg[negKey] else {return nil}
+    if a == abs(b) {
+        neg.removeValue(forKey: negKey)
+        pos.removeValue(forKey: posKey)
+        return (Payment(from: negKey, to: posKey, payment: -b), (pos, neg))
+    } else if a > abs(b) {
+        pos.updateValue(pos[posKey]! + b, forKey: posKey)
+        neg.removeValue(forKey: negKey)
+        return (Payment(from: negKey, to: posKey, payment: -b), (pos, neg))
+    } else {
+        pos.removeValue(forKey: posKey)
+        neg.updateValue(neg[negKey]! + a, forKey: negKey)
+        return (Payment(from:negKey, to: posKey, payment: a), (pos, neg))
+    }
+}
+
+func reconcile(_ ent: Entry) -> [Payment] {
+    var result = [Payment]()
+    var pos = ent.filter({$0.value > 0})
+    var neg = ent.filter({$0.value < 0})
+    while !pos.isEmpty && !neg.isEmpty {
+        for (kp, kn) in pairs(pos: pos, neg: neg) {
+            let v = pos[kp]!
+            pos.removeValue(forKey: kp)
+            neg.removeValue(forKey: kn)
+            result.append(Payment(from: kn, to: kp, payment: v))
+        }
+        if pos.isEmpty || neg.isEmpty {
+            return result
+        }
+        if let (p, (newPos, newNeg)) = randPair((pos, neg)) {
+            pos = newPos
+            neg = newNeg
+            result.append(p)
+        }
+    }
+    return result
+}
+
+func shortList(_ ent: Entry) -> [Payment]? {
+    var paymentsList: [[Payment]] = []
+    for _ in 0..<1000 {
+        paymentsList.append(reconcile(ent))
+    }
+    return paymentsList.min(by: {$0.count < $1.count})
+}
+
+func toLedger(_ ent: Entry) -> Ledger<Person> {
+    let pos = ent.filter({$0.value > 0}).mapValues({Int($0 * 100)})
+    let neg = ent.filter({$0.value < 0}).mapValues({Int($0 * -100)})
+    return Ledger(positives: pos, negatives: neg)
+}
+
+func toPayment(_ triple: (Person, Person, Int)) -> Payment {
+    return Payment(from: triple.0, to: triple.1, payment: Double(triple.2) / 100.0)
 }
 
 extension Payment : Equatable {
@@ -171,5 +190,33 @@ extension Payment : Equatable {
     }
 }
 
+func getDocumentsDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    return paths[0]
+}
 
+func getSheetItURL(_ name: String) -> URL {
+    return getDocumentsDirectory().appendingPathComponent(name)
+}
 
+func writeSheet(name: String, sheet: Sheet) {
+    let url = getSheetItURL(name)
+    let encoder = JSONEncoder()
+    do {
+        let json = try encoder.encode(sheet)
+        try json.write(to: url)
+    } catch {
+        print("Could not encode and save sheet")
+    }
+}
+
+func readSheet(_ name: String) -> Sheet {
+    let url = getSheetItURL(name)
+    do {
+        let data = try Data(contentsOf: url)
+        let sheet = try JSONDecoder().decode(Sheet.self, from: data)
+        return sheet
+    } catch {
+        return Sheet()
+    }
+}

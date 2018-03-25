@@ -8,48 +8,58 @@
 
 import UIKit
 
-class ViewController: UITableViewController {
+class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
+    
+    
     
     var currentSheet: Sheet!
-    
-  
-// For testing, needs to be deleted. --------------------------------------------------------------
-    var john: Person!
-    var paul: Person!
-    var george: Person!
-    var ringo: Person!
-    var bowling: Event!
-    var skiing: Event!
-//-------------------------------------------------------------------------------------------------
+    var sheetName: String!
+    var nameField = UITextField()
+    var nickField = UITextField()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Sheet-It"
+        title = "Sheet 💵 It"
+        let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
+        navigationController?.navigationBar.barTintColor = UIColor.white
+        navigationController?.navigationBar.tintColor = textColor
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
+        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
         navigationController?.navigationBar.prefersLargeTitles = true
-        
-        let addParticipantButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: nil)
-        let paymentsButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(paymentsTapped))
+        let sheetsButton = UIBarButtonItem(title: "Sheets", style: .plain,  target: self, action: #selector(sheetsTapped))
+        sheetsButton.tintColor = textColor
+        let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
+        settleButton.tintColor = textColor
+        let addMemberButton = UIBarButtonItem(title: "Add Member", style: .plain, target: self, action: #selector(participantTapped))
+        addMemberButton.tintColor = textColor
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
-
-        self.toolbarItems = [addParticipantButton, space, paymentsButton, space, addEventButton]
-// For testing, needs to be deleted. --------------------------------------------------------------
-        john = Person(personID: UUID(), name: "John Lennon", nick: "JL")
-        paul = Person(personID: UUID(), name: "Paul McCartney", nick: "PM")
-        george = Person(personID: UUID(), name: "George Harrison", nick: "GH")
-        ringo = Person(personID: UUID(), name: "Ringo Starr", nick: "RS")
-        bowling = Event(eventID: UUID(), description: "Bowling", date: Date.init(timeIntervalSinceNow: 10), payer: john, participants: [john, paul, ringo, george], amount: 120)
-        skiing = Event(eventID: UUID(), description: "Skiing at Jackson Hole", date: Date(timeIntervalSinceNow: 11), payer: ringo, participants: [george, ringo], amount: 900)
-        let people = [john!, paul!, george!, ringo!]
-        let events = [bowling!, skiing!]
-        currentSheet = Sheet(people:people, events: events)
-//-------------------------------------------------------------------------------------------------
+        navigationItem.rightBarButtonItems = [addEventButton, space, addMemberButton]
+        navigationItem.leftBarButtonItem = self.editButtonItem
+        toolbarItems = [sheetsButton, space, settleButton]
+        let sheetNames = UserDefaults.standard.object(forKey:"SavedSheets") as? [String] ?? [String]()
+        let sheetIndex = UserDefaults.standard.integer(forKey: "Index")
+        if sheetNames == [] {
+            currentSheet = Sheet()
+        } else {
+            sheetName = sheetNames[sheetIndex]
+            currentSheet = readSheet(sheetName)
+            title = sheetName
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.toolbar.isHidden = false
+        tableView.reloadData()
     }
-
+    
+    func dataChanged(_ sheet: String) {
+        sheetName = sheet
+        title = sheet
+        currentSheet = readSheet(sheet)
+        tableView.reloadData()
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currentSheet.events.count
     }
@@ -60,7 +70,7 @@ class ViewController: UITableViewController {
         cell.detailTextLabel?.text = String(format: "$%.02f", currentSheet.events[indexPath.row].amount)
         return cell
     }
-    
+        
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Sheet") as? SheetViewController {
             evc.selectedEvent = currentSheet.events[indexPath.row]
@@ -68,21 +78,74 @@ class ViewController: UITableViewController {
         }
     }
     
-    @objc func paymentsTapped() {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            currentSheet.events.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            writeSheet(name: sheetName, sheet: currentSheet)
+        }
+    }
+    
+    @objc func settleTapped() {
         if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
-            pvc.payments = reconcile(total(currentSheet))
+            let entry = total(currentSheet)
+            if entry.count > 15 {
+                pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
+            } else {
+                let l = toLedger(entry)
+                pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
+            }
             navigationController?.pushViewController(pvc, animated: true)
         }
     }
     
     @objc func entryTapped() {
         if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? EntryViewController {
-            evc.participants = currentSheet.people
-            let backItem = UIBarButtonItem()
-            backItem.title = "Cancel"
-            navigationItem.backBarButtonItem = backItem
+            evc.currentSheet = currentSheet
+            evc.sheetName = sheetName
             navigationController?.pushViewController(evc, animated: true)
+            }
+    }
+    
+    @objc func sheetsTapped() {
+        if let svc = storyboard?.instantiateViewController(withIdentifier: "Sheets") as? SheetsViewController {
+            svc.delegate = self
+            navigationController?.pushViewController(svc, animated: true)
         }
+    }
+    
+    @objc func participantTapped() {
+        let participantAlertController = UIAlertController(title: "New Participant", message: nil, preferredStyle: .alert)
+        
+        func getName(t: UITextField) {
+            t.placeholder = "Name"
+            t.clearButtonMode = .always
+            t.delegate = self
+        }
+        
+        func add(a: UIAlertAction) {
+            if let name = participantAlertController.textFields?[0].text {
+                if name != ""  {
+                    currentSheet.people.append(Person(name: name, email: nil))
+                    writeSheet(name: sheetName, sheet: currentSheet)
+                }
+            }
+        }
+        
+        participantAlertController.addTextField(configurationHandler: getName)
+        nameField = participantAlertController.textFields![0]
+        participantAlertController.addAction(UIAlertAction(title: "Add", style: .default, handler: add))
+        participantAlertController.addAction((UIAlertAction(title: "Cancel", style: .cancel, handler: nil)))
+        present(participantAlertController, animated: true)
+    }
+
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField === nameField {
+            if currentSheet.people.map({$0.name}).contains(nameField.text!) {
+                return false
+            }
+        }
+        return true
     }
     
     override func didReceiveMemoryWarning() {

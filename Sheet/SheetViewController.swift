@@ -34,9 +34,10 @@ class SheetViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "Participant", for: indexPath)
-            cell.textLabel?.text = selectedEvent?.participants[indexPath.row].name
-            return cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Participant", for: indexPath)
+        cell.textLabel?.text = selectedEvent?.participants[indexPath.row].name
+        cell.detailTextLabel?.text = String(format: "$%.02f", selectedEvent!.amount / Double(selectedEvent!.participants.count))
+        return cell
     }
     
     override func didReceiveMemoryWarning() {
