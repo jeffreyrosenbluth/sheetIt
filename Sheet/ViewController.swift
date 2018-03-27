@@ -20,6 +20,8 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "EntryCell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Add")
+
         title = "Sheet 💵 It"
         let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
         navigationController?.navigationBar.barTintColor = UIColor.white
@@ -34,8 +36,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         let addMemberButton = UIBarButtonItem(title: "Add Member", style: .plain, target: self, action: #selector(participantTapped))
         addMemberButton.tintColor = textColor
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
-        navigationItem.rightBarButtonItems = [addEventButton, space, addMemberButton]
+        navigationItem.rightBarButtonItems = [addMemberButton]
         navigationItem.leftBarButtonItem = self.editButtonItem
         navigationController?.setToolbarHidden(false, animated: true)
         toolbarItems = [sheetsButton, space, settleButton]
@@ -63,10 +64,20 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return currentSheet.events.count
+        return currentSheet.events.count + 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.row == currentSheet.events.count {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Add", for: indexPath)
+            let button = UIButton(type: .contactAdd)
+            cell.addSubview(button)
+            button.addTarget(self, action: #selector(entryTapped), for: UIControlEvents.touchUpInside)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.centerXAnchor.constraint(equalTo: cell.centerXAnchor).isActive = true
+            button.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
+            return cell
+        }
         let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath)
         cell.accessoryType = UITableViewCellAccessoryType.disclosureIndicator
         cell.textLabel?.text = currentSheet.events[indexPath.row].description
