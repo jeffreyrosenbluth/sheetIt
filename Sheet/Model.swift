@@ -85,6 +85,15 @@ class Sheet: Codable {
     }
 }
 
+func participants(event: Event, sheet: Sheet) -> (Int, Set<Int>) {
+    let people = sheet.people
+    let players = event.participants
+    let payer = event.payer
+    let payerIndex = people.index(of: payer) ?? -1
+    let playerIndices = players.map({people.index(of: $0) ?? -1})
+    return (payerIndex,Set(playerIndices))
+}
+
 func total(_ sheet: Sheet) -> Entry {
     var result = Entry()
     let entries = sheet.events.map {$0.entry}
@@ -205,8 +214,8 @@ func writeSheet(name: String, sheet: Sheet) {
     do {
         let json = try encoder.encode(sheet)
         try json.write(to: url)
-    } catch {
-        print("Could not encode and save sheet")
+    } catch let error {
+        print(error)
     }
 }
 

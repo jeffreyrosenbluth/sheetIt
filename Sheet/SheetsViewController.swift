@@ -32,7 +32,8 @@ class SheetsViewController: UITableViewController, UITextFieldDelegate {
         loadSheetButton.tintColor = textColor
         editButtonItem.tintColor = textColor
         toolbarItems = [loadSheetButton, space, editButtonItem]
-         self.clearsSelectionOnViewWillAppear = false
+        self.clearsSelectionOnViewWillAppear = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
     
     @objc func addSheetTapped() {
@@ -82,7 +83,7 @@ class SheetsViewController: UITableViewController, UITextFieldDelegate {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SheetName", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         cell.textLabel?.text = sheetNames[indexPath.row]
         return cell
     }

@@ -72,10 +72,15 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     }
         
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let evc = storyboard?.instantiateViewController(withIdentifier: "Sheet") as? SheetViewController {
-            evc.selectedEvent = currentSheet.events[indexPath.row]
-            navigationController?.pushViewController(evc, animated: true)
-        }
+        let evc = EventViewController()
+        let event = currentSheet.events[indexPath.row]
+        evc.sheetName = sheetName
+        evc.descriptionView.text = event.description
+        evc.amountView.text = String(format: "%.02f", event.amount)
+        evc.dateView.date = event.date
+        evc.currentEvent = event
+        evc.currentSheet = currentSheet
+        navigationController?.pushViewController(evc, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
@@ -87,31 +92,28 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     }
     
     @objc func settleTapped() {
-        if let pvc = storyboard?.instantiateViewController(withIdentifier: "Payment") as? PaymentViewController {
-            let entry = total(currentSheet)
-            if entry.count > 15 {
-                pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
-            } else {
-                let l = toLedger(entry)
-                pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
-            }
-            navigationController?.pushViewController(pvc, animated: true)
+        let pvc = PaymentViewController()
+        let entry = total(currentSheet)
+        if entry.count > 15 {
+            pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
+        } else {
+            let l = toLedger(entry)
+            pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
         }
+        navigationController?.pushViewController(pvc, animated: true)
     }
     
     @objc func entryTapped() {
-        if let evc = storyboard?.instantiateViewController(withIdentifier: "Entry") as? EntryViewController {
-            evc.currentSheet = currentSheet
-            evc.sheetName = sheetName
-            navigationController?.pushViewController(evc, animated: true)
-            }
+        let evc = EventViewController()
+        evc.currentSheet = currentSheet
+        evc.sheetName = sheetName
+        navigationController?.pushViewController(evc, animated: true)
     }
     
     @objc func sheetsTapped() {
-        if let svc = storyboard?.instantiateViewController(withIdentifier: "Sheets") as? SheetsViewController {
-            svc.delegate = self
-            navigationController?.pushViewController(svc, animated: true)
-        }
+        let svc = SheetsViewController()
+        svc.delegate = self
+        navigationController?.pushViewController(svc, animated: true)
     }
     
     @objc func participantTapped() {
