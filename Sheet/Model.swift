@@ -80,8 +80,8 @@ class Sheet: Codable {
     var people = [Person]()
     var events = [Event]()
     
-    func deleteEntry(sheet: Sheet, id: UUID) {
-        sheet.events = sheet.events.filter({$0.eventID != id})
+    func deleteEntry(id: UUID) {
+        events = events.filter({$0.eventID != id})
     }
 }
 

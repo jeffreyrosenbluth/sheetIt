@@ -68,6 +68,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath)
+        cell.accessoryType = UITableViewCellAccessoryType.disclosureIndicator
         cell.textLabel?.text = currentSheet.events[indexPath.row].description
         cell.detailTextLabel?.text = String(format: "$%.02f", currentSheet.events[indexPath.row].amount)
         return cell

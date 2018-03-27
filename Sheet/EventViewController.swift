@@ -52,7 +52,7 @@ class EventViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
-        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped))
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(doneTapped))
         navigationItem.rightBarButtonItem = doneButton
         title = "Enter an Event"
         
@@ -155,6 +155,9 @@ class EventViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         let event = Event(eventID: UUID(), description: descriptionView.text!, date: dateView.date, payer: payer, participants: participants, amount: payment)
         if event.valid {
+            if let cs = currentEvent {
+                currentSheet.deleteEntry(id: cs.eventID)
+            }
             currentSheet.events.append(event)
             currentSheet.events.sort(by: {$0.date < $1.date})
             writeSheet(name: sheetName, sheet: currentSheet)
