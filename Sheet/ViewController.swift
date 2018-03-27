@@ -19,6 +19,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "EntryCell")
         title = "Sheet 💵 It"
         let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
         navigationController?.navigationBar.barTintColor = UIColor.white
@@ -36,6 +37,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         let addEventButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(entryTapped))
         navigationItem.rightBarButtonItems = [addEventButton, space, addMemberButton]
         navigationItem.leftBarButtonItem = self.editButtonItem
+        navigationController?.setToolbarHidden(false, animated: true)
         toolbarItems = [sheetsButton, space, settleButton]
         let sheetNames = UserDefaults.standard.object(forKey:"SavedSheets") as? [String] ?? [String]()
         let sheetIndex = UserDefaults.standard.integer(forKey: "Index")
