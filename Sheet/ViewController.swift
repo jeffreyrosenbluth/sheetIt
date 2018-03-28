@@ -10,12 +10,11 @@ import UIKit
 
 class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
     
-    
-    
     var currentSheet: Sheet!
     var sheetName: String!
     var nameField = UITextField()
     var nickField = UITextField()
+    let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +22,6 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Add")
 
         title = "Sheet 💵 It"
-        let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
         navigationController?.navigationBar.barTintColor = UIColor.white
         navigationController?.navigationBar.tintColor = textColor
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
@@ -73,6 +71,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             let button = UIButton(type: .contactAdd)
             cell.addSubview(button)
             button.addTarget(self, action: #selector(entryTapped), for: UIControlEvents.touchUpInside)
+            button.tintColor = textColor
             button.translatesAutoresizingMaskIntoConstraints = false
             button.centerXAnchor.constraint(equalTo: cell.centerXAnchor).isActive = true
             button.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
@@ -86,6 +85,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     }
         
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == currentSheet.events.count {return}
         let evc = EventViewController()
         let event = currentSheet.events[indexPath.row]
         evc.sheetName = sheetName
@@ -103,6 +103,13 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             tableView.deleteRows(at: [indexPath], with: .automatic)
             writeSheet(name: sheetName, sheet: currentSheet)
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        if indexPath.row == currentSheet.events.count {
+            return false
+        }
+        return true
     }
     
     @objc func settleTapped() {
