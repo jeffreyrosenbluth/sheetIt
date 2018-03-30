@@ -8,8 +8,33 @@
 
 import UIKit
 
-class EventViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
+class PersonCell: UICollectionViewCell {
+    var text = UILabel()
+    var check = UILabel()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        text.backgroundColor = .white
+        text.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(text)
+        text.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        text.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        
+        check.backgroundColor = .white
+        check.translatesAutoresizingMaskIntoConstraints = false
+        check.text = "✓"
+        check.font = UIFont.boldSystemFont(ofSize: 17)
+        contentView.addSubview(check)
+        check.leadingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+        check.topAnchor.constraint(equalTo: topAnchor).isActive = true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
 
+class EventViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+   
     var currentEvent: Event?
     var currentSheet = Sheet()
     var sheetName = ""
@@ -41,14 +66,6 @@ class EventViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return picker
     }()
     
-    let participantView: UITableView = {
-        let table = UITableView()
-        table.translatesAutoresizingMaskIntoConstraints = false
-        table.separatorStyle = .none
-        table.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        return table
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -58,16 +75,26 @@ class EventViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         descriptionView.delegate = self
         amountView.delegate = self
-        participantView.delegate = self
-        participantView.dataSource = self
-        
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.delegate = self
+        cv.dataSource = self
+        cv.register(PersonCell.self, forCellWithReuseIdentifier: "Person")
+        cv.backgroundColor = .white
+        cv.translatesAutoresizingMaskIntoConstraints = false
+       
         view.backgroundColor = .white
         view.addSubview(descriptionView)
         view.addSubview(amountView)
         view.addSubview(dateView)
-        view.addSubview(participantView)
+        
         setupLayout()
         
+        view.addSubview(cv)
+        cv.topAnchor.constraint(equalTo: dateView.bottomAnchor, constant: 12).isActive = true
+        cv.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
+        cv.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        cv.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         if let event = currentEvent {
             let (payer, players) = participants(event: event, sheet: currentSheet)
             payerIndex = payer
@@ -80,62 +107,63 @@ class EventViewController: UIViewController, UITableViewDelegate, UITableViewDat
         descriptionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
         descriptionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
         
-        amountView.topAnchor.constraint(equalTo: descriptionView.bottomAnchor, constant: 6).isActive = true
+        amountView.topAnchor.constraint(equalTo: descriptionView.bottomAnchor, constant: 10).isActive = true
         amountView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
         amountView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
         
-        dateView.topAnchor.constraint(equalTo: amountView.bottomAnchor, constant: 6).isActive = true
+        dateView.topAnchor.constraint(equalTo: amountView.bottomAnchor, constant: 12).isActive = true
         dateView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
         dateView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        
-        participantView.topAnchor.constraint(equalTo: dateView.bottomAnchor, constant: 6).isActive = true
-        participantView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        participantView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        participantView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return currentSheet.people.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Person", for: indexPath) as! PersonCell
         if payerIndex == indexPath.row {
-            cell.textLabel?.text = "🔵 \(currentSheet.people[indexPath.row].name)"
+            cell.text.text = "🔵 \(currentSheet.people[indexPath.row].name)"
         } else {
-            cell.textLabel?.text = "⚪️ \(currentSheet.people[indexPath.row].name)"
+            cell.text.text = "⚪️ \(currentSheet.people[indexPath.row].name)"
         }
         if selectedPeople.contains(indexPath.row) {
-            cell.accessoryType = .checkmark
+            cell.check.textColor = .blue
         } else {
-            cell.accessoryType = .none
+            cell.check.textColor = .white
         }
+        cell.backgroundColor = .white
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let w = view.frame.width
+        return CGSize(width: (w-80) / 2, height: 35);
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        if let cell = collectionView.cellForItem(at: indexPath as IndexPath) as? PersonCell {
             let isParticipant = selectedPeople.contains(indexPath.row)
             if isParticipant && indexPath.row == payerIndex {
-                cell.accessoryType = .none
+                cell.check.textColor = .white
                 selectedPeople.remove(indexPath.row)
-                tableView.reloadData()
+                collectionView.reloadData()
             }
             else if isParticipant {
                 payerIndex = indexPath.row
-                tableView.reloadData()
+                collectionView.reloadData()
             }
             else if indexPath.row == payerIndex {
                 payerIndex = -1
-                tableView.reloadData()
+                collectionView.reloadData()
             } else {
-                cell.accessoryType = .checkmark
+                cell.check.textColor = .blue
                 selectedPeople.update(with: indexPath.row)
             }
         }
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.toolbar.isHidden = true
     }

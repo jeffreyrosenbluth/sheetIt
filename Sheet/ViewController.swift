@@ -70,6 +70,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             let cell = tableView.dequeueReusableCell(withIdentifier: "Add", for: indexPath)
             let button = UIButton(type: .contactAdd)
             cell.addSubview(button)
+            cell.selectionStyle = .none
             button.addTarget(self, action: #selector(entryTapped), for: UIControlEvents.touchUpInside)
             button.tintColor = textColor
             button.translatesAutoresizingMaskIntoConstraints = false

@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let vc = ViewController()
         rvc.pushViewController(vc, animated: true)
         return true
+
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
