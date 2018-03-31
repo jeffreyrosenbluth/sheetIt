@@ -8,6 +8,16 @@
 
 import UIKit
 
+class EventCell: UITableViewCell {
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: UITableViewCellStyle.value1, reuseIdentifier: reuseIdentifier)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
     
     var currentSheet: Sheet!
@@ -18,17 +28,20 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "EntryCell")
+        tableView.register(EventCell.self, forCellReuseIdentifier: "EntryCell")
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Add")
-
         title = "Sheet 💵 It"
+        
         navigationController?.navigationBar.barTintColor = UIColor.white
         navigationController?.navigationBar.tintColor = textColor
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
         navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
         navigationController?.navigationBar.prefersLargeTitles = true
+        
         let sheetsButton = UIBarButtonItem(title: "Sheets", style: .plain,  target: self, action: #selector(sheetsTapped))
         sheetsButton.tintColor = textColor
+        let debtsButton = UIBarButtonItem(title: "Debts", style: .plain, target: self, action: #selector(debtsTapped))
+        debtsButton.tintColor = textColor
         let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
         settleButton.tintColor = textColor
         let addMemberButton = UIBarButtonItem(title: "Add Member", style: .plain, target: self, action: #selector(participantTapped))
@@ -37,7 +50,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         navigationItem.rightBarButtonItems = [addMemberButton]
         navigationItem.leftBarButtonItem = self.editButtonItem
         navigationController?.setToolbarHidden(false, animated: true)
-        toolbarItems = [sheetsButton, space, settleButton]
+        toolbarItems = [sheetsButton, space, debtsButton, space, settleButton]
         let sheetNames = UserDefaults.standard.object(forKey:"SavedSheets") as? [String] ?? [String]()
         let sheetIndex = UserDefaults.standard.integer(forKey: "Index")
         if sheetNames == [] {
@@ -78,10 +91,11 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             button.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as! EventCell
         cell.accessoryType = UITableViewCellAccessoryType.disclosureIndicator
         cell.textLabel?.text = currentSheet.events[indexPath.row].description
         cell.detailTextLabel?.text = String(format: "$%.02f", currentSheet.events[indexPath.row].amount)
+        cell.detailTextLabel?.textColor = UIColor(named: "dollarGreen")
         return cell
     }
         
@@ -123,6 +137,13 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
         }
         navigationController?.pushViewController(pvc, animated: true)
+    }
+    
+    @objc func debtsTapped() {
+        let entry = total(currentSheet)
+        let dvc = DebtViewController()
+        dvc.entry = entry
+        navigationController?.pushViewController(dvc, animated: true)
     }
     
     @objc func entryTapped() {

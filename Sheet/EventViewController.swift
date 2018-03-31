@@ -33,7 +33,7 @@ class PersonCell: UICollectionViewCell {
     }
 }
 
-class EventViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+class EventViewController: UIViewController {
    
     var currentEvent: Event?
     var currentSheet = Sheet()
@@ -75,6 +75,7 @@ class EventViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
         
         descriptionView.delegate = self
         amountView.delegate = self
+        
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.delegate = self
@@ -116,54 +117,6 @@ class EventViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
         dateView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return currentSheet.people.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Person", for: indexPath) as! PersonCell
-        if payerIndex == indexPath.row {
-            cell.text.text = "🔵 \(currentSheet.people[indexPath.row].name)"
-        } else {
-            cell.text.text = "⚪️ \(currentSheet.people[indexPath.row].name)"
-        }
-        if selectedPeople.contains(indexPath.row) {
-            cell.check.textColor = .blue
-        } else {
-            cell.check.textColor = .white
-        }
-        cell.backgroundColor = .white
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let w = view.frame.width
-        return CGSize(width: (w-80) / 2, height: 35);
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
-        if let cell = collectionView.cellForItem(at: indexPath as IndexPath) as? PersonCell {
-            let isParticipant = selectedPeople.contains(indexPath.row)
-            if isParticipant && indexPath.row == payerIndex {
-                cell.check.textColor = .white
-                selectedPeople.remove(indexPath.row)
-                collectionView.reloadData()
-            }
-            else if isParticipant {
-                payerIndex = indexPath.row
-                collectionView.reloadData()
-            }
-            else if indexPath.row == payerIndex {
-                payerIndex = -1
-                collectionView.reloadData()
-            } else {
-                cell.check.textColor = .blue
-                selectedPeople.update(with: indexPath.row)
-            }
-        }
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.toolbar.isHidden = true
     }
@@ -193,25 +146,66 @@ class EventViewController: UIViewController, UIPickerViewDelegate, UIPickerViewD
         navigationController?.popViewController(animated: true)
     }
     
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return currentSheet.people.count
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return currentSheet.people[row].name
-    }
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+}
+
+extension EventViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let w = view.frame.width
+        return CGSize(width: (w-80) / 2, height: 35);
+    }
+}
+
+extension EventViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return currentSheet.people.count
+    }
     
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Person", for: indexPath) as! PersonCell
+        if payerIndex == indexPath.row {
+            cell.text.text = "🔵 \(currentSheet.people[indexPath.row].name)"
+        } else {
+            cell.text.text = "⚪️ \(currentSheet.people[indexPath.row].name)"
+        }
+        if selectedPeople.contains(indexPath.row) {
+            cell.check.textColor = .blue
+        } else {
+            cell.check.textColor = .white
+        }
+        cell.backgroundColor = .white
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        if let cell = collectionView.cellForItem(at: indexPath as IndexPath) as? PersonCell {
+            let isParticipant = selectedPeople.contains(indexPath.row)
+            if isParticipant && indexPath.row == payerIndex {
+                cell.check.textColor = .white
+                selectedPeople.remove(indexPath.row)
+                collectionView.reloadData()
+            }
+            else if isParticipant {
+                payerIndex = indexPath.row
+                collectionView.reloadData()
+            }
+            else if indexPath.row == payerIndex {
+                payerIndex = -1
+                collectionView.reloadData()
+            } else {
+                cell.check.textColor = .blue
+                selectedPeople.update(with: indexPath.row)
+            }
+        }
+    }
+}
+
+extension EventViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
-        
 }
