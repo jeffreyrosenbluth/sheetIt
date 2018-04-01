@@ -72,8 +72,7 @@ class PaymentViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.largeTitleDisplayMode = .never
-        title = "Payments"
+        title = "Settlement"
         tableView.register(PaymentCell.self, forCellReuseIdentifier: "Cell")
         tableView.rowHeight = 75
     }

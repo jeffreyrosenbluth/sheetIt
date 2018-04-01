@@ -34,6 +34,7 @@ class DebtViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(DebtCell.self, forCellReuseIdentifier: "Cell")
+        title = "Debts"
       
     }
 
