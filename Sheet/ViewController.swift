@@ -24,7 +24,6 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
     var sheetName: String!
     var nameField = UITextField()
     var nickField = UITextField()
-    let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,19 +32,16 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         title = "Sheet 💵 It"
         
         navigationController?.navigationBar.barTintColor = UIColor.white
-        navigationController?.navigationBar.tintColor = textColor
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor]
-        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: textColor, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
+        navigationController?.navigationBar.tintColor = UIColor(named: "dollarGreen")
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor(named: "dollarGreen")!]
+        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor(named: "dollarGreen")!, NSAttributedStringKey.font: UIFont.italicSystemFont(ofSize: 30)]
         navigationController?.navigationBar.prefersLargeTitles = true
         
         let sheetsButton = UIBarButtonItem(title: "Sheets", style: .plain,  target: self, action: #selector(sheetsTapped))
-        sheetsButton.tintColor = textColor
         let debtsButton = UIBarButtonItem(title: "Debts", style: .plain, target: self, action: #selector(debtsTapped))
-        debtsButton.tintColor = textColor
         let settleButton = UIBarButtonItem(title: "Settle", style: .plain, target: self, action: #selector(settleTapped))
-        settleButton.tintColor = textColor
         let addMemberButton = UIBarButtonItem(title: "Add Member", style: .plain, target: self, action: #selector(participantTapped))
-        addMemberButton.tintColor = textColor
+        [sheetsButton, debtsButton, settleButton, addMemberButton].forEach({$0.tintColor = UIColor(named: "dollarGreen")})
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         navigationItem.rightBarButtonItems = [addMemberButton]
         navigationItem.leftBarButtonItem = self.editButtonItem
@@ -85,7 +81,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
             cell.addSubview(button)
             cell.selectionStyle = .none
             button.addTarget(self, action: #selector(entryTapped), for: UIControlEvents.touchUpInside)
-            button.tintColor = textColor
+            button.tintColor = UIColor(named: "dollarGreen")
             button.translatesAutoresizingMaskIntoConstraints = false
             button.centerXAnchor.constraint(equalTo: cell.centerXAnchor).isActive = true
             button.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true

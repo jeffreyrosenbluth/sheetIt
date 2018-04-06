@@ -66,6 +66,15 @@ class EventViewController: UIViewController {
         return picker
     }()
     
+    let peopleView: UICollectionView = {
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.register(PersonCell.self, forCellWithReuseIdentifier: "Person")
+        cv.backgroundColor = .white
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        return cv
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -75,27 +84,16 @@ class EventViewController: UIViewController {
         
         descriptionView.delegate = self
         amountView.delegate = self
-        
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.delegate = self
-        cv.dataSource = self
-        cv.register(PersonCell.self, forCellWithReuseIdentifier: "Person")
-        cv.backgroundColor = .white
-        cv.translatesAutoresizingMaskIntoConstraints = false
+        peopleView.delegate = self
+        peopleView.dataSource = self
        
         view.backgroundColor = .white
         view.addSubview(descriptionView)
         view.addSubview(amountView)
         view.addSubview(dateView)
-        
+        view.addSubview(peopleView)
         setupLayout()
         
-        view.addSubview(cv)
-        cv.topAnchor.constraint(equalTo: dateView.bottomAnchor, constant: 12).isActive = true
-        cv.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        cv.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        cv.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         if let event = currentEvent {
             let (payer, players) = participants(event: event, sheet: currentSheet)
             payerIndex = payer
@@ -115,6 +113,11 @@ class EventViewController: UIViewController {
         dateView.topAnchor.constraint(equalTo: amountView.bottomAnchor, constant: 12).isActive = true
         dateView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
         dateView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        
+        peopleView.topAnchor.constraint(equalTo: dateView.bottomAnchor, constant: 12).isActive = true
+        peopleView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
+        peopleView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        peopleView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -24,13 +24,12 @@ class SheetsViewController: UITableViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         sheetNames = UserDefaults.standard.object(forKey:"SavedSheets") as? [String] ?? [String]()
-        let textColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
         let addSheetButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addSheetTapped))
         navigationItem.rightBarButtonItem = addSheetButton
         let loadSheetButton = UIBarButtonItem(title: "Open", style: .plain,  target: self, action: #selector(loadSheetTapped))
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        loadSheetButton.tintColor = textColor
-        editButtonItem.tintColor = textColor
+        loadSheetButton.tintColor = UIColor(named: "dollarGreen")
+        editButtonItem.tintColor = UIColor(named: "dollarGreen")
         toolbarItems = [loadSheetButton, space, editButtonItem]
         self.clearsSelectionOnViewWillAppear = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")

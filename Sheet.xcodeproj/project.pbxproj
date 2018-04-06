@@ -46,6 +46,7 @@
 		CED9654A1FC5E09700D00754 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED965491FC5E09700D00754 /* Model.swift */; };
 		CED9654C1FC60C7900D00754 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED9654B1FC60C7900D00754 /* ModelTests.swift */; };
 		CED965561FC8896300D00754 /* PaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED965551FC8896300D00754 /* PaymentViewController.swift */; };
+		CEE8B4E720726C3F007B6416 /* UIViewX.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE8B4E620726C3F007B6416 /* UIViewX.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +112,7 @@
 		CED965491FC5E09700D00754 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		CED9654B1FC60C7900D00754 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		CED965551FC8896300D00754 /* PaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewController.swift; sourceTree = "<group>"; };
+		CEE8B4E620726C3F007B6416 /* UIViewX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewX.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +196,7 @@
 			children = (
 				CEBB9295200EA632003272DC /* AppIcon.appiconset */,
 				CE0B9E69206851C8003FF190 /* EventViewController.swift */,
+				CEE8B4E620726C3F007B6416 /* UIViewX.swift */,
 				CED9651D1FC5DEA900D00754 /* ViewController.swift */,
 				CED965551FC8896300D00754 /* PaymentViewController.swift */,
 				CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */,
@@ -389,6 +392,7 @@
 				CEBED341206FE9D2008A3904 /* DebtViewController.swift in Sources */,
 				CE9971CE1FD5DB6B00053671 /* Transaction.swift in Sources */,
 				CE2FBFD61FF0309A00C65C64 /* SheetsViewController.swift in Sources */,
+				CEE8B4E720726C3F007B6416 /* UIViewX.swift in Sources */,
 				CED9654A1FC5E09700D00754 /* Model.swift in Sources */,
 				CED965561FC8896300D00754 /* PaymentViewController.swift in Sources */,
 				CED9651E1FC5DEA900D00754 /* ViewController.swift in Sources */,

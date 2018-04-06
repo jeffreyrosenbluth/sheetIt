@@ -55,10 +55,8 @@ class PaymentCell: UITableViewCell {
         to.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor).isActive = true
         to.font = semiBold
         
-        let greenColor = UIColor(red: 64/255, green: 128/255, blue: 0, alpha: 1)
-        let redColor = UIColor(red: 166/255, green: 0, blue: 0, alpha: 1)
-        to.textColor = greenColor
-        from.textColor = redColor
+        to.textColor = UIColor(named: "dollarGreen")
+        from.textColor = UIColor(named: "brick")
     }
     
     required init?(coder aDecoder: NSCoder) {
