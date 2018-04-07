@@ -13,19 +13,20 @@ class PersonCell: UICollectionViewCell {
     var check = UILabel()
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         text.backgroundColor = .white
-        text.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(text)
-        text.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        text.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        contentView.addSubview(text, constraints: [
+            equal(\.topAnchor),
+            equal(\.leadingAnchor)
+        ])
         
         check.backgroundColor = .white
-        check.translatesAutoresizingMaskIntoConstraints = false
         check.text = "✓"
         check.font = UIFont.boldSystemFont(ofSize: 17)
-        contentView.addSubview(check)
-        check.leadingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
-        check.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        contentView.addSubview(check, constraints: [
+            equal(\.topAnchor)
+        ])
+        check.leadingAnchor.attach(trailingAnchor, -20)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -43,7 +44,6 @@ class EventViewController: UIViewController {
     
     let descriptionView: UITextField = {
         let descriptionView =  UITextField()
-        descriptionView.translatesAutoresizingMaskIntoConstraints = false
         descriptionView.font = UIFont.systemFont(ofSize: 17)
         descriptionView.placeholder = "Event"
         descriptionView.borderStyle = .roundedRect
@@ -52,7 +52,6 @@ class EventViewController: UIViewController {
 
     let amountView: UITextField = {
         let amountView =  UITextField()
-        amountView.translatesAutoresizingMaskIntoConstraints = false
         amountView.font = UIFont.systemFont(ofSize: 17)
         amountView.placeholder = "Amount"
         amountView.borderStyle = .roundedRect
@@ -61,7 +60,6 @@ class EventViewController: UIViewController {
     
     let dateView: UIDatePicker = {
         let picker = UIDatePicker()
-        picker.translatesAutoresizingMaskIntoConstraints = false
         picker.datePickerMode = .date
         return picker
     }()
@@ -71,7 +69,6 @@ class EventViewController: UIViewController {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.register(PersonCell.self, forCellWithReuseIdentifier: "Person")
         cv.backgroundColor = .white
-        cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
     
@@ -88,36 +85,37 @@ class EventViewController: UIViewController {
         peopleView.dataSource = self
        
         view.backgroundColor = .white
-        view.addSubview(descriptionView)
-        view.addSubview(amountView)
-        view.addSubview(dateView)
-        view.addSubview(peopleView)
-        setupLayout()
+        
+        view.addSubview(descriptionView, constraints: [
+            equal(\.leadingAnchor, \.safeAreaLayoutGuide.leadingAnchor, 20),
+            equal(\.topAnchor, \.safeAreaLayoutGuide.topAnchor, 20),
+            equal(\.trailingAnchor, \.safeAreaLayoutGuide.trailingAnchor, -20)
+        ])
+        
+        view.addSubview(amountView, constraints: [
+            equal(\.leadingAnchor, \.safeAreaLayoutGuide.leadingAnchor, 20),
+            equal(\.trailingAnchor, \.safeAreaLayoutGuide.trailingAnchor, -20)
+            ])
+        amountView.topAnchor.attach(descriptionView.bottomAnchor, 10)
+        
+        view.addSubview(dateView, constraints: [
+            equal(\.leadingAnchor, \.safeAreaLayoutGuide.leadingAnchor, 20),
+            equal(\.trailingAnchor, \.safeAreaLayoutGuide.trailingAnchor, -20)
+            ])
+        dateView.topAnchor.attach(amountView.bottomAnchor, 12)
+        
+        view.addSubview(peopleView, constraints: [
+            equal(\.leadingAnchor, \.safeAreaLayoutGuide.leadingAnchor, 20),
+            equal(\.trailingAnchor, \.safeAreaLayoutGuide.trailingAnchor, -20),
+            equal(\.bottomAnchor, \.safeAreaLayoutGuide.bottomAnchor)
+            ])
+        peopleView.topAnchor.attach(dateView.bottomAnchor, 12)
         
         if let event = currentEvent {
             let (payer, players) = participants(event: event, sheet: currentSheet)
             payerIndex = payer
             selectedPeople = players
         }
-    }
-    
-    private func setupLayout() {
-        descriptionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
-        descriptionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        descriptionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        
-        amountView.topAnchor.constraint(equalTo: descriptionView.bottomAnchor, constant: 10).isActive = true
-        amountView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        amountView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        
-        dateView.topAnchor.constraint(equalTo: amountView.bottomAnchor, constant: 12).isActive = true
-        dateView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        dateView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        
-        peopleView.topAnchor.constraint(equalTo: dateView.bottomAnchor, constant: 12).isActive = true
-        peopleView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        peopleView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        peopleView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
     override func viewWillAppear(_ animated: Bool) {

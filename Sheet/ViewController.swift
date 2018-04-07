@@ -78,13 +78,15 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         if indexPath.row == currentSheet.events.count {
             let cell = tableView.dequeueReusableCell(withIdentifier: "Add", for: indexPath)
             let button = UIButton(type: .contactAdd)
-            cell.addSubview(button)
-            cell.selectionStyle = .none
+            
             button.addTarget(self, action: #selector(entryTapped), for: UIControlEvents.touchUpInside)
             button.tintColor = UIColor(named: "dollarGreen")
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.centerXAnchor.constraint(equalTo: cell.centerXAnchor).isActive = true
-            button.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
+            
+            cell.addSubview(button, constraints: [
+                equal(\.centerXAnchor),
+                equal(\.centerYAnchor)
+            ])
+            cell.selectionStyle = .none
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as! EventCell

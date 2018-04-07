@@ -17,42 +17,41 @@ class PaymentCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        let marginGuide = contentView.layoutMarginsGuide
         let ultraLight = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.ultraLight)
         let semiBold = UIFont.systemFont(ofSize: 17, weight: UIFont.Weight.semibold)
         
-        contentView.addSubview(from)
-        from.translatesAutoresizingMaskIntoConstraints = false
-        from.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor).isActive = true
-        from.topAnchor.constraint(equalTo: marginGuide.topAnchor, constant: 10).isActive = true
+        contentView.addSubview(from, constraints: [
+            equal(\.leadingAnchor, \.layoutMarginsGuide.leadingAnchor),
+            equal(\.topAnchor, \.layoutMarginsGuide.topAnchor, 10)
+        ])
         from.font = semiBold
         
         let fromLabel = UILabel()
-        contentView.addSubview(fromLabel)
-        fromLabel.translatesAutoresizingMaskIntoConstraints = false
-        fromLabel.topAnchor.constraint(equalTo: from.bottomAnchor, constant: 5).isActive = true
-        fromLabel.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor).isActive = true
+        contentView.addSubview(fromLabel, constraints: [
+            equal(\.leadingAnchor, \.layoutMarginsGuide.leadingAnchor)
+        ])
+        fromLabel.topAnchor.attach(from.bottomAnchor, 5)
         fromLabel.font = ultraLight
         fromLabel.text = "pays →"
-        
-        contentView.addSubview(amount)
-        amount.translatesAutoresizingMaskIntoConstraints = false
-        amount.centerXAnchor.constraint(equalTo: marginGuide.centerXAnchor).isActive = true
-        amount.centerYAnchor.constraint(equalTo: marginGuide.centerYAnchor).isActive = true
+
+        contentView.addSubview(amount, constraints: [
+            equal(\.centerXAnchor, \.layoutMarginsGuide.centerXAnchor),
+            equal(\.centerYAnchor, \.layoutMarginsGuide.centerYAnchor)
+        ])
         amount.font = semiBold
         
         let toLabel = UILabel()
-        contentView.addSubview(toLabel)
-        toLabel.translatesAutoresizingMaskIntoConstraints = false
-        toLabel.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor).isActive = true
-        toLabel.topAnchor.constraint(equalTo: marginGuide.topAnchor, constant: 10).isActive = true
+        contentView.addSubview(toLabel, constraints: [
+            equal(\.trailingAnchor, \.layoutMarginsGuide.trailingAnchor),
+            equal(\.topAnchor, \.layoutMarginsGuide.topAnchor, 10)
+            ])
         toLabel.font = ultraLight
         toLabel.text = "→ to"
         
-        contentView.addSubview(to)
-        to.translatesAutoresizingMaskIntoConstraints = false
-        to.topAnchor.constraint(equalTo: toLabel.bottomAnchor, constant: 5).isActive = true
-        to.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor).isActive = true
+        contentView.addSubview(to, constraints: [
+            equal(\.trailingAnchor, \.layoutMarginsGuide.trailingAnchor)
+        ])
+        to.topAnchor.attach(toLabel.bottomAnchor, 5)
         to.font = semiBold
         
         to.textColor = UIColor(named: "dollarGreen")
