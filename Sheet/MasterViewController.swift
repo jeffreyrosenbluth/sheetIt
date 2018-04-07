@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MasterViewController.swift
 //  Sheet
 //
 //  Created by Jeffrey Rosenbluth on 11/22/17.
@@ -18,7 +18,7 @@ final class EventCell: UITableViewCell {
     }
 }
 
-final class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
+final class MasterViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
     
     private var currentSheet: Sheet!
     private var sheetName: String!

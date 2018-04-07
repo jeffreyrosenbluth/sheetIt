@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = rvc
         window!.makeKeyAndVisible()
         
-        let vc = ViewController()
+        let vc = MasterViewController()
         rvc.pushViewController(vc, animated: true)
         return true
 
