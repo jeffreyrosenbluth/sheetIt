@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EventCell: UITableViewCell {
+final class EventCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: UITableViewCellStyle.value1, reuseIdentifier: reuseIdentifier)
     }
@@ -18,12 +18,12 @@ class EventCell: UITableViewCell {
     }
 }
 
-class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
+final class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate {
     
-    var currentSheet: Sheet!
-    var sheetName: String!
-    var nameField = UITextField()
-    var nickField = UITextField()
+    private var currentSheet: Sheet!
+    private var sheetName: String!
+    private var nameField = UITextField()
+    private var nickField = UITextField()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -125,7 +125,7 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         return true
     }
     
-    @objc func settleTapped() {
+    @objc private func settleTapped() {
         let pvc = PaymentViewController()
         let entry = total(currentSheet)
         if entry.count > 15 {
@@ -137,27 +137,27 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         navigationController?.pushViewController(pvc, animated: true)
     }
     
-    @objc func debtsTapped() {
+    @objc private func debtsTapped() {
         let entry = total(currentSheet)
         let dvc = DebtViewController()
         dvc.entry = entry
         navigationController?.pushViewController(dvc, animated: true)
     }
     
-    @objc func entryTapped() {
+    @objc private func entryTapped() {
         let evc = EventViewController()
         evc.currentSheet = currentSheet
         evc.sheetName = sheetName
         navigationController?.pushViewController(evc, animated: true)
     }
     
-    @objc func sheetsTapped() {
+    @objc private func sheetsTapped() {
         let svc = SheetsViewController()
         svc.delegate = self
         navigationController?.pushViewController(svc, animated: true)
     }
     
-    @objc func participantTapped() {
+    @objc private func participantTapped() {
         let participantAlertController = UIAlertController(title: "New Participant", message: nil, preferredStyle: .alert)
         
         func getName(t: UITextField) {
@@ -190,12 +190,5 @@ class ViewController: UITableViewController, UITextFieldDelegate, SheetsDelegate
         }
         return true
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
 }
 

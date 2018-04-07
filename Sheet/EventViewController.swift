@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PersonCell: UICollectionViewCell {
+final class PersonCell: UICollectionViewCell {
     var text = UILabel()
     var check = UILabel()
     override init(frame: CGRect) {
@@ -34,13 +34,13 @@ class PersonCell: UICollectionViewCell {
     }
 }
 
-class EventViewController: UIViewController {
+final class EventViewController: UIViewController {
    
     var currentEvent: Event?
     var currentSheet = Sheet()
     var sheetName = ""
-    var selectedPeople: Set<Int> = []
-    var payerIndex = -1
+    private var selectedPeople: Set<Int> = []
+    private var payerIndex = -1
     
     let descriptionView: UITextField = {
         let descriptionView =  UITextField()

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class DebtCell: UITableViewCell {
+final class DebtCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: UITableViewCellStyle.value1, reuseIdentifier: reuseIdentifier)
     }
@@ -18,9 +18,8 @@ class DebtCell: UITableViewCell {
     }
 }
 
-class DebtViewController: UITableViewController {
+final class DebtViewController: UITableViewController {
     var entry: Entry = [:]
-    
     var debts: [(String, Double)] {
         var ps: [(String, Double)] = []
         for (k,v) in entry {
@@ -35,7 +34,6 @@ class DebtViewController: UITableViewController {
         tableView.dataSource = self
         tableView.register(DebtCell.self, forCellReuseIdentifier: "Cell")
         title = "Debts"
-      
     }
 
     override func didReceiveMemoryWarning() {
