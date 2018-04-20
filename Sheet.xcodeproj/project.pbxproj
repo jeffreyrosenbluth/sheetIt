@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		CE0B9E6A206851C8003FF190 /* EventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0B9E69206851C8003FF190 /* EventViewController.swift */; };
 		CE2FBFD61FF0309A00C65C64 /* SheetsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */; };
-		CE9971CE1FD5DB6B00053671 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9971CD1FD5DB6B00053671 /* Transaction.swift */; };
 		CE9971D01FD5DB9A00053671 /* PQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9971CF1FD5DB9A00053671 /* PQ.swift */; };
 		CE9971D21FD5ED8600053671 /* TransactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9971D11FD5ED8600053671 /* TransactionTests.swift */; };
 		CEBB92AE200EA632003272DC /* Icon-App-57x57@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBB9296200EA632003272DC /* Icon-App-57x57@1x.png */; };
@@ -69,7 +68,6 @@
 /* Begin PBXFileReference section */
 		CE0B9E69206851C8003FF190 /* EventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
 		CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetsViewController.swift; sourceTree = "<group>"; };
-		CE9971CD1FD5DB6B00053671 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		CE9971CF1FD5DB9A00053671 /* PQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PQ.swift; sourceTree = "<group>"; };
 		CE9971D11FD5ED8600053671 /* TransactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTests.swift; sourceTree = "<group>"; };
 		CEBB9296200EA632003272DC /* Icon-App-57x57@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-App-57x57@1x.png"; sourceTree = "<group>"; };
@@ -202,7 +200,6 @@
 				CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */,
 				CEBED340206FE9D2008A3904 /* DebtViewController.swift */,
 				CED965491FC5E09700D00754 /* Model.swift */,
-				CE9971CD1FD5DB6B00053671 /* Transaction.swift */,
 				CE9971CF1FD5DB9A00053671 /* PQ.swift */,
 				CED9651B1FC5DEA900D00754 /* AppDelegate.swift */,
 				CED965221FC5DEA900D00754 /* Assets.xcassets */,
@@ -390,7 +387,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEBED341206FE9D2008A3904 /* DebtViewController.swift in Sources */,
-				CE9971CE1FD5DB6B00053671 /* Transaction.swift in Sources */,
 				CE2FBFD61FF0309A00C65C64 /* SheetsViewController.swift in Sources */,
 				CEE8B4E720726C3F007B6416 /* Anchor.swift in Sources */,
 				CED9654A1FC5E09700D00754 /* Model.swift in Sources */,

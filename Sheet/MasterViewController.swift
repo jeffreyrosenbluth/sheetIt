@@ -128,12 +128,8 @@ final class MasterViewController: UITableViewController, UITextFieldDelegate, Sh
     @objc private func settleTapped() {
         let pvc = PaymentViewController()
         let entry = total(currentSheet)
-        if entry.count > 15 {
-            pvc.payments = shortList(entry)?.sorted(by: {$0.payment >= $1.payment})
-        } else {
-            let l = toLedger(entry)
-            pvc.payments = reconcileLedgerOpt(l).sorted(by: {$0.payment >= $1.payment})
-        }
+        let payments = settle(entry)
+        pvc.payments = payments.sorted(){ $0.payment >= $1.payment }
         navigationController?.pushViewController(pvc, animated: true)
     }
     

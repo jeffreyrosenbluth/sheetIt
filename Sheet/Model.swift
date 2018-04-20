@@ -42,9 +42,8 @@ struct Event: Codable {
     
     var entry: Entry {
         let owe = -amount / Double(participants.count)
-        var e: Entry = [:]
-        for participant in participants {
-            e[participant] = owe
+        var e: Entry = participants.reduce(into: [:]) { result, element in
+            return result[element] = owe
         }
         if let payerShare = e[payer] {
             e.updateValue(payerShare + amount, forKey: payer)
@@ -91,7 +90,7 @@ func participants(event: Event, sheet: Sheet) -> (Int, Set<Int>) {
     let payer = event.payer
     let payerIndex = people.index(of: payer) ?? -1
     let playerIndices = players.map({people.index(of: $0) ?? -1})
-    return (payerIndex,Set(playerIndices))
+    return (payerIndex, Set(playerIndices))
 }
 
 func total(_ sheet: Sheet) -> Entry {
@@ -125,68 +124,30 @@ func pairs<K,V: Numeric>(pos: [K:V], neg: [K:V]) -> [(K, K)] {
     return result
 }
 
-func randPair(_ e: (Entry, Entry)) -> (Payment, (Entry, Entry))? {
-    var (pos, neg) = e
-    let negIdx = Int(arc4random_uniform(UInt32(neg.count)))
-    let posIdx = Int(arc4random_uniform(UInt32(pos.count)))
-    let negKey = Array(neg.keys)[negIdx]
-    let posKey = Array(pos.keys)[posIdx]
-    guard let a = pos[posKey] else {return nil}
-    guard let b = neg[negKey] else {return nil}
-    if a == abs(b) {
-        neg.removeValue(forKey: negKey)
-        pos.removeValue(forKey: posKey)
-        return (Payment(from: negKey, to: posKey, payment: -b), (pos, neg))
-    } else if a > abs(b) {
-        pos.updateValue(pos[posKey]! + b, forKey: posKey)
-        neg.removeValue(forKey: negKey)
-        return (Payment(from: negKey, to: posKey, payment: -b), (pos, neg))
-    } else {
-        pos.removeValue(forKey: posKey)
-        neg.updateValue(neg[negKey]! + a, forKey: negKey)
-        return (Payment(from:negKey, to: posKey, payment: a), (pos, neg))
-    }
-}
-
-func reconcile(_ ent: Entry) -> [Payment] {
-    var result = [Payment]()
-    var pos = ent.filter({$0.value > 0})
-    var neg = ent.filter({$0.value < 0})
-    while !pos.isEmpty && !neg.isEmpty {
-        for (kp, kn) in pairs(pos: pos, neg: neg) {
-            let v = pos[kp]!
-            pos.removeValue(forKey: kp)
-            neg.removeValue(forKey: kn)
-            result.append(Payment(from: kn, to: kp, payment: v))
+func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)? {
+    func ans(_ dict: [K: V]) -> (K, V)? {
+        guard dict.count > 0 else {return nil}
+        var result: (K, V)! = nil
+        for (k, v) in dict {
+            if let r = result {
+                if comp(v, r.1) {
+                    result = (k, v)
+                }
+            } else {
+                result = (k, v)
+            }
         }
-        if pos.isEmpty || neg.isEmpty {
-            return result
-        }
-        if let (p, (newPos, newNeg)) = randPair((pos, neg)) {
-            pos = newPos
-            neg = newNeg
-            result.append(p)
-        }
+        return result
     }
-    return result
+    return ans
 }
 
-func shortList(_ ent: Entry) -> [Payment]? {
-    var paymentsList: [[Payment]] = []
-    for _ in 0..<1000 {
-        paymentsList.append(reconcile(ent))
-    }
-    return paymentsList.min(by: {$0.count < $1.count})
+func minValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
+    return extremum(comp: <)(dict)
 }
 
-func toLedger(_ ent: Entry) -> Ledger<Person> {
-    let pos = ent.filter({$0.value > 0}).mapValues({Int($0 * 100)})
-    let neg = ent.filter({$0.value < 0}).mapValues({Int($0 * -100)})
-    return Ledger(positives: pos, negatives: neg)
-}
-
-func toPayment(_ triple: (Person, Person, Int)) -> Payment {
-    return Payment(from: triple.0, to: triple.1, payment: Double(triple.2) / 100.0)
+func maxValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
+    return extremum(comp: >)(dict)
 }
 
 extension Payment : Equatable {
@@ -228,4 +189,134 @@ func readSheet(_ name: String) -> Sheet {
     } catch {
         return Sheet()
     }
+}
+
+// Settlement Algorithm
+
+func combinations<T>(_ xs: [T], _ k: Int) -> [[T]] {
+    guard xs.count >= k else { return [] }
+    guard xs.count > 0 && k > 0 else { return [[]] }
+    if k == 1 {
+        return xs.map {[$0]}
+    }
+    var c = [[T]]()
+    for (idx, x) in xs.enumerated() {
+        var xs1 = xs
+        xs1.removeFirst(idx + 1)
+        c += combinations(xs1, k - 1).map {[x] + $0}
+    }
+    return c
+}
+
+typealias Dict<T> = [Int : [[T]]]
+
+func tabulate(_ entry: Entry, _ m: Int) -> (posDict: Dict<Person>, negDict: Dict<Person>) {
+    var pDict: Dict<Person> = [:]
+    var nDict: Dict<Person> = [:]
+    let keys = Array(entry.keys)
+    for i in 1...m {
+        for ys in combinations(keys, i) {
+            let sum = ys.reduce(0, {r, e in
+                return r + Int(entry[e]! * 100)
+            })
+            if sum > 0 {
+                var val = pDict[sum] ?? []
+                val.append(ys)
+                pDict.updateValue(val, forKey: sum)
+            } else if sum < 0 {
+                var val = nDict[sum] ?? []
+                val.append(ys)
+                nDict.updateValue(val, forKey: sum)
+            }
+        }
+    }
+    return (pDict, nDict)
+}
+
+func matches(posDict: Dict<Person>, negDict: Dict<Person>) -> [[Person]] {
+    var people : [[Person]] = []
+    for (v, p) in posDict {
+        guard var qs = negDict[-v] else { continue }
+        var ps = p
+        while !ps.isEmpty && !qs.isEmpty {
+            if !hasOverlap(ps[0], qs[0]) {
+                let rs = ps[0] + qs[0]
+                people.append(rs)
+            }
+            ps.removeFirst()
+            qs.removeFirst()
+        }
+    }
+    return people.sorted(){$0.count <= $1.count}
+}
+
+func hasOverlap<T: Equatable>(_ xs: [T], _ ys: [T]) -> Bool {
+    for x in xs {
+        if ys.contains(x) {
+            return true
+        }
+    }
+    return false
+}
+
+func validMatches(_ people: [[Person]], _ n: Int) -> [[Person]] {
+    var used: [Person] = []
+    var result: [[Person]] = []
+    for ps in people {
+        if !hasOverlap(used, ps) {
+            used.append(contentsOf: ps)
+            result.append(ps)
+            if used.count == n { return result}
+        }
+    }
+    return result
+}
+
+func pair(_ entry: Entry) -> (Payment, Entry) {
+    var ent = entry
+    var pos = entry.filter(){ $0.value > 0 }
+    var neg = entry.filter(){ $0.value < 0 }
+    let (f, a) = maxValue(pos)!
+    let (t, temp) = minValue(neg)!
+    let b = -temp
+    if a == b {
+        ent.removeValue(forKey: t)
+        ent.removeValue(forKey: f)
+        return (Payment(from: t, to: f, payment: a), ent)
+    }
+    if a > b {
+        ent.updateValue(pos[f]! - b, forKey: f)
+        ent.removeValue(forKey: t)
+        return (Payment(from: t, to: f, payment: b), ent)
+    } else {
+        ent.removeValue(forKey: f)
+        ent.updateValue(neg[t]! + a, forKey: t)
+        return (Payment(from: t, to: f, payment: a), ent)
+    }
+}
+
+func reconcileNaive(_ entry: Entry) -> [Payment] {
+    var ent = entry
+    var result = [Payment]()
+    while ent.count >= 2 {
+        let (p, newEnt) = pair(ent)
+        ent = newEnt
+        result.append(p)
+    }
+    return result
+}
+
+func fromKeys<K, V>(_ dict: [K : V], _ keys: [K]) -> [K : V] {
+    return dict.filter(){keys.contains($0.key)}
+}
+
+func settle(_ entry: Entry) -> [Payment] {
+    let table = tabulate(entry, 6)
+    let groups = matches(posDict: table.posDict, negDict: table.negDict)
+    let validGroups = validMatches(groups, entry.count)
+    let validDicts = validGroups.map(){ fromKeys(entry, $0) }
+    let validPayments = Array(validDicts.map(){ reconcileNaive($0) }.joined())
+    let remaining = entry.filter(){ !validGroups.joined().contains($0.key) }
+    let remainingPayments = reconcileNaive(remaining)
+    return validPayments + remainingPayments
 }
