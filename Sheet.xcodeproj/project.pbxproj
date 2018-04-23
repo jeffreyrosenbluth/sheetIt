@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		CE0B9E6A206851C8003FF190 /* EventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0B9E69206851C8003FF190 /* EventViewController.swift */; };
 		CE2FBFD61FF0309A00C65C64 /* SheetsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */; };
-		CE9971D01FD5DB9A00053671 /* PQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9971CF1FD5DB9A00053671 /* PQ.swift */; };
 		CE9971D21FD5ED8600053671 /* TransactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9971D11FD5ED8600053671 /* TransactionTests.swift */; };
 		CEBB92AE200EA632003272DC /* Icon-App-57x57@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBB9296200EA632003272DC /* Icon-App-57x57@1x.png */; };
 		CEBB92AF200EA632003272DC /* Icon-App-76x76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBB9297200EA632003272DC /* Icon-App-76x76@2x.png */; };
@@ -68,7 +67,6 @@
 /* Begin PBXFileReference section */
 		CE0B9E69206851C8003FF190 /* EventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
 		CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetsViewController.swift; sourceTree = "<group>"; };
-		CE9971CF1FD5DB9A00053671 /* PQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PQ.swift; sourceTree = "<group>"; };
 		CE9971D11FD5ED8600053671 /* TransactionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTests.swift; sourceTree = "<group>"; };
 		CEBB9296200EA632003272DC /* Icon-App-57x57@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-App-57x57@1x.png"; sourceTree = "<group>"; };
 		CEBB9297200EA632003272DC /* Icon-App-76x76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-App-76x76@2x.png"; sourceTree = "<group>"; };
@@ -200,7 +198,6 @@
 				CE2FBFD51FF0309A00C65C64 /* SheetsViewController.swift */,
 				CEBED340206FE9D2008A3904 /* DebtViewController.swift */,
 				CED965491FC5E09700D00754 /* Model.swift */,
-				CE9971CF1FD5DB9A00053671 /* PQ.swift */,
 				CED9651B1FC5DEA900D00754 /* AppDelegate.swift */,
 				CED965221FC5DEA900D00754 /* Assets.xcassets */,
 				CED965241FC5DEA900D00754 /* LaunchScreen.storyboard */,
@@ -393,7 +390,6 @@
 				CED965561FC8896300D00754 /* PaymentViewController.swift in Sources */,
 				CED9651E1FC5DEA900D00754 /* MasterViewController.swift in Sources */,
 				CE0B9E6A206851C8003FF190 /* EventViewController.swift in Sources */,
-				CE9971D01FD5DB9A00053671 /* PQ.swift in Sources */,
 				CED9651C1FC5DEA900D00754 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -29,7 +29,7 @@ class TransactionTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        let p = 14
+        let p = 20
         let max = 10000
         var pos: [Person:Int] = [:]
         var sgn = 1
@@ -41,7 +41,7 @@ class TransactionTests: XCTestCase {
             }
             pos.updateValue(1 * sgn + sgn * Int(arc4random_uniform(UInt32(max))), forKey:  q("P\(i)"))
         }
-        
+    
         let posSum = pos.values.reduce(0, +)
         pos.updateValue(-posSum, forKey: q("T"))
         let d = pos.mapValues(){Double($0)}

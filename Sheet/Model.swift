@@ -8,6 +8,8 @@
 
 import Foundation
 
+private let maxSubsetSize = 6
+
 struct Person: Codable {
     let name : String
     let email : String?
@@ -27,8 +29,6 @@ extension Person: Hashable {
         return name.hashValue
     }
 }
-
-let noOne = Person(name: "No One", email: nil)
 
 typealias Entry = [Person: Double]
 
@@ -75,12 +75,12 @@ extension Event : Equatable {
     }
 }
 
-class Sheet: Codable {
+final class Sheet: Codable {
     var people = [Person]()
     var events = [Event]()
     
     func deleteEntry(id: UUID) {
-        events = events.filter({$0.eventID != id})
+        events = events.filter {$0.eventID != id}
     }
 }
 
@@ -89,7 +89,7 @@ func participants(event: Event, sheet: Sheet) -> (Int, Set<Int>) {
     let players = event.participants
     let payer = event.payer
     let payerIndex = people.index(of: payer) ?? -1
-    let playerIndices = players.map({people.index(of: $0) ?? -1})
+    let playerIndices = players.map {people.index(of: $0) ?? -1}
     return (payerIndex, Set(playerIndices))
 }
 
@@ -114,41 +114,6 @@ struct Payment {
     let payment : Double
 }
 
-func pairs<K,V: Numeric>(pos: [K:V], neg: [K:V]) -> [(K, K)] {
-    var result: [(K,K)] = []
-    for (k, v) in pos {
-        if let r = neg.first(where: {$0.value == 0 - v}) {
-            result.append((k, r.0))
-        }
-    }
-    return result
-}
-
-func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)? {
-    func ans(_ dict: [K: V]) -> (K, V)? {
-        guard dict.count > 0 else {return nil}
-        var result: (K, V)! = nil
-        for (k, v) in dict {
-            if let r = result {
-                if comp(v, r.1) {
-                    result = (k, v)
-                }
-            } else {
-                result = (k, v)
-            }
-        }
-        return result
-    }
-    return ans
-}
-
-func minValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
-    return extremum(comp: <)(dict)
-}
-
-func maxValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
-    return extremum(comp: >)(dict)
-}
 
 extension Payment : Equatable {
     static func ==(lhs: Payment, rhs: Payment) -> Bool {
@@ -160,12 +125,12 @@ extension Payment : Equatable {
     }
 }
 
-func getDocumentsDirectory() -> URL {
+private func getDocumentsDirectory() -> URL {
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     return paths[0]
 }
 
-func getSheetItURL(_ name: String) -> URL {
+private func getSheetItURL(_ name: String) -> URL {
     return getDocumentsDirectory().appendingPathComponent(name)
 }
 
@@ -193,7 +158,33 @@ func readSheet(_ name: String) -> Sheet {
 
 // Settlement Algorithm
 
-func combinations<T>(_ xs: [T], _ k: Int) -> [[T]] {
+private func extremum<K,V>(comp: @escaping (V, V) -> Bool) -> ([K: V]) -> (K, V)? {
+    func ans(_ dict: [K: V]) -> (K, V)? {
+        guard dict.count > 0 else {return nil}
+        var result: (K, V)! = nil
+        for (k, v) in dict {
+            if let r = result {
+                if comp(v, r.1) {
+                    result = (k, v)
+                }
+            } else {
+                result = (k, v)
+            }
+        }
+        return result
+    }
+    return ans
+}
+
+private func minValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
+    return extremum(comp: <)(dict)
+}
+
+private func maxValue<K,V:Comparable>(_ dict: [K: V]) -> (K, V)? {
+    return extremum(comp: >)(dict)
+}
+
+private func combinations<T>(_ xs: [T], _ k: Int) -> [[T]] {
     guard xs.count >= k else { return [] }
     guard xs.count > 0 && k > 0 else { return [[]] }
     if k == 1 {
@@ -208,9 +199,9 @@ func combinations<T>(_ xs: [T], _ k: Int) -> [[T]] {
     return c
 }
 
-typealias Dict<T> = [Int : [[T]]]
+private typealias Dict<T> = [Int : [[T]]]
 
-func tabulate(_ entry: Entry, _ m: Int) -> (posDict: Dict<Person>, negDict: Dict<Person>) {
+private func tabulate(_ entry: Entry, _ m: Int) -> (posDict: Dict<Person>, negDict: Dict<Person>) {
     var pDict: Dict<Person> = [:]
     var nDict: Dict<Person> = [:]
     let keys = Array(entry.keys)
@@ -233,24 +224,23 @@ func tabulate(_ entry: Entry, _ m: Int) -> (posDict: Dict<Person>, negDict: Dict
     return (pDict, nDict)
 }
 
-func matches(posDict: Dict<Person>, negDict: Dict<Person>) -> [[Person]] {
+private func matches(posDict: Dict<Person>, negDict: Dict<Person>) -> [[Person]] {
     var people : [[Person]] = []
-    for (v, p) in posDict {
-        guard var qs = negDict[-v] else { continue }
-        var ps = p
-        while !ps.isEmpty && !qs.isEmpty {
-            if !hasOverlap(ps[0], qs[0]) {
-                let rs = ps[0] + qs[0]
-                people.append(rs)
+    for (v, ps) in posDict {
+        guard let qs = negDict[-v] else { continue }
+        for x in ps {
+            for y in qs {
+                if !hasOverlap(x, y) {
+                    let rs = x + y
+                    people.append(rs)
+                }
             }
-            ps.removeFirst()
-            qs.removeFirst()
         }
     }
     return people.sorted(){$0.count <= $1.count}
 }
 
-func hasOverlap<T: Equatable>(_ xs: [T], _ ys: [T]) -> Bool {
+private func hasOverlap<T: Equatable>(_ xs: [T], _ ys: [T]) -> Bool {
     for x in xs {
         if ys.contains(x) {
             return true
@@ -259,7 +249,7 @@ func hasOverlap<T: Equatable>(_ xs: [T], _ ys: [T]) -> Bool {
     return false
 }
 
-func validMatches(_ people: [[Person]], _ n: Int) -> [[Person]] {
+private func validMatches(_ people: [[Person]], _ n: Int) -> [[Person]] {
     var used: [Person] = []
     var result: [[Person]] = []
     for ps in people {
@@ -272,7 +262,7 @@ func validMatches(_ people: [[Person]], _ n: Int) -> [[Person]] {
     return result
 }
 
-func pair(_ entry: Entry) -> (Payment, Entry) {
+private func pair(_ entry: Entry) -> (Payment, Entry) {
     var ent = entry
     var pos = entry.filter(){ $0.value > 0 }
     var neg = entry.filter(){ $0.value < 0 }
@@ -295,7 +285,7 @@ func pair(_ entry: Entry) -> (Payment, Entry) {
     }
 }
 
-func reconcileNaive(_ entry: Entry) -> [Payment] {
+private func settleNaive(_ entry: Entry) -> [Payment] {
     var ent = entry
     var result = [Payment]()
     while ent.count >= 2 {
@@ -306,17 +296,17 @@ func reconcileNaive(_ entry: Entry) -> [Payment] {
     return result
 }
 
-func fromKeys<K, V>(_ dict: [K : V], _ keys: [K]) -> [K : V] {
-    return dict.filter(){keys.contains($0.key)}
+private func fromKeys<K, V>(_ dict: [K : V], _ keys: [K]) -> [K : V] {
+    return dict.filter {keys.contains($0.key)}
 }
 
 func settle(_ entry: Entry) -> [Payment] {
-    let table = tabulate(entry, 6)
+    let table = tabulate(entry, maxSubsetSize)
     let groups = matches(posDict: table.posDict, negDict: table.negDict)
     let validGroups = validMatches(groups, entry.count)
-    let validDicts = validGroups.map(){ fromKeys(entry, $0) }
-    let validPayments = Array(validDicts.map(){ reconcileNaive($0) }.joined())
-    let remaining = entry.filter(){ !validGroups.joined().contains($0.key) }
-    let remainingPayments = reconcileNaive(remaining)
+    let validDicts = validGroups.map { fromKeys(entry, $0) }
+    let validPayments = Array(validDicts.map { settleNaive($0) }.joined())
+    let remaining = entry.filter { !validGroups.joined().contains($0.key) }
+    let remainingPayments = settleNaive(remaining)
     return validPayments + remainingPayments
 }
